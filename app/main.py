@@ -1,5 +1,7 @@
 from pathlib import Path
+import os
 import time
+import webbrowser
 
 from alembic import command
 from alembic.config import Config
@@ -35,6 +37,8 @@ app = FastAPI(title="RentalApi", version="0.1.0")
 @app.on_event("startup")
 def startup_event() -> None:
     run_migrations()
+    if os.getenv("OPEN_SWAGGER_ON_STARTUP") == "1":
+        webbrowser.open("http://127.0.0.1:8000/docs")
 
 
 app.include_router(health_router)

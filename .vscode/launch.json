@@ -1,0 +1,42 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "RentalApi Debug",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "app.main:app"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "OPEN_SWAGGER_ON_STARTUP": "1"
+      },
+      "jinja": true,
+      "justMyCode": true,
+      "serverReadyAction": {
+        "pattern": "Uvicorn running on (http://127\\.0\\.0\\.1:[0-9]+)",
+        "uriFormat": "%s/docs",
+        "action": "openExternally"
+      }
+    },
+    {
+      "name": "RentalApi Run",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "app.main:app",
+        "--reload"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "OPEN_SWAGGER_ON_STARTUP": "1"
+      },
+      "jinja": true,
+      "justMyCode": true,
+      "noDebug": true
+    }
+  ]
+}
