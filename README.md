@@ -68,6 +68,11 @@ Al iniciar, la aplicacion ejecuta las migraciones de Alembic para crear o actual
 - Swagger UI: `http://127.0.0.1:8000/docs`
 - Health check: `http://127.0.0.1:8000/health`
 
+## Documentacion
+
+- `docs/README.md`: indice de documentacion escrita.
+- `docs/assets/documentacion.html`: mapa vivo del proyecto para consultar como levantarlo, entender la arquitectura y resolver dudas frecuentes.
+
 ## Gestion del proyecto
 
 El seguimiento operativo de tareas e issues vive en Linear:

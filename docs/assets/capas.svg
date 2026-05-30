@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1380" height="760" viewBox="0 0 1380 760" role="img" aria-labelledby="title desc">
+  <title id="title">Capas y responsabilidades de RentalApi</title>
+  <desc id="desc">Mapa visual claro de request DTO, controller, service, repository, models, response DTO y soporte transversal.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#06101d"/>
+      <stop offset="1" stop-color="#10243a"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" x2="1">
+      <stop offset="0" stop-color="#0284c7"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <style>
+      .bg{fill:url(#bg)}
+      .panel{fill:#0c1a2c;stroke:rgba(158,190,220,.24);stroke-width:2}
+      .support{fill:#07111f;stroke:rgba(103,232,249,.26);stroke-width:2}
+      .box{fill:#12233a;stroke:rgba(158,190,220,.30);stroke-width:2}
+      .head{fill:url(#accent)}
+      .note{fill:rgba(56,189,248,.10);stroke:rgba(56,189,248,.28);stroke-width:1.5}
+      .title{font:700 42px Georgia,serif;fill:#eaf4ff}
+      .subtitle{font:16px Verdana,sans-serif;fill:#b8cce3}
+      .section{font:700 15px Verdana,sans-serif;fill:#67e8f9;letter-spacing:.08em}
+      .label{font:800 20px Verdana,sans-serif;fill:#03111f}
+      .body{font:15px Verdana,sans-serif;fill:#eaf4ff}
+      .small{font:12px Verdana,sans-serif;fill:#b8cce3}
+      .tiny{font:11px Verdana,sans-serif;fill:#b8cce3}
+      .arrow{stroke:#38bdf8;stroke-width:3;fill:none;marker-end:url(#arrow)}
+      .return{stroke:#86efac;stroke-width:3;fill:none;marker-end:url(#greenArrow)}
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#38bdf8"/>
+    </marker>
+    <marker id="greenArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#86efac"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1380" height="760" rx="32"/>
+  <text x="56" y="66" class="title">Capas de RentalApi</text>
+  <text x="58" y="100" class="subtitle">Una guia para decidir donde tocar: HTTP, reglas, consultas, tablas y contratos de datos.</text>
+
+  <rect x="58" y="136" width="870" height="474" rx="28" class="panel"/>
+  <text x="92" y="176" class="section">FLUJO PRINCIPAL</text>
+
+  <g transform="translate(112,230)">
+    <rect width="210" height="96" rx="18" class="box"/>
+    <rect width="210" height="36" rx="18" class="head"/>
+    <text x="18" y="25" class="label">request DTO</text>
+    <text x="18" y="63" class="body">Datos que entran</text>
+    <text x="18" y="82" class="small">Body, query params, filtros</text>
+  </g>
+
+  <g transform="translate(405,230)">
+    <rect width="230" height="106" rx="18" class="box"/>
+    <rect width="230" height="36" rx="18" class="head"/>
+    <text x="18" y="25" class="label">controller</text>
+    <text x="18" y="64" class="body">Ida y vuelta HTTP</text>
+    <text x="18" y="84" class="small">Recibe y responde</text>
+  </g>
+
+  <g transform="translate(685,230)">
+    <rect width="210" height="96" rx="18" class="box"/>
+    <rect width="210" height="36" rx="18" class="head"/>
+    <text x="18" y="25" class="label">response DTO</text>
+    <text x="18" y="63" class="body">Datos que salen</text>
+    <text x="18" y="82" class="small">Contrato de respuesta</text>
+  </g>
+
+  <g transform="translate(405,385)">
+    <rect width="230" height="110" rx="18" class="box"/>
+    <rect width="230" height="36" rx="18" class="head"/>
+    <text x="18" y="25" class="label">service</text>
+    <text x="18" y="64" class="body">Logica de negocio</text>
+    <text x="18" y="84" class="small">Valida, calcula y decide</text>
+  </g>
+
+  <g transform="translate(112,500)">
+    <rect width="210" height="92" rx="18" class="box"/>
+    <rect width="210" height="36" rx="18" class="head"/>
+    <text x="18" y="25" class="label">repository</text>
+    <text x="18" y="63" class="body">Queries a la DB</text>
+    <text x="18" y="81" class="small">Busca, guarda, actualiza</text>
+  </g>
+
+  <g transform="translate(685,500)">
+    <rect width="210" height="92" rx="18" class="box"/>
+    <rect width="210" height="36" rx="18" class="head"/>
+    <text x="18" y="25" class="label">models</text>
+    <text x="18" y="63" class="body">Tablas SQLAlchemy</text>
+    <text x="18" y="81" class="small">Entidades persistidas</text>
+  </g>
+
+  <path class="arrow" d="M322 278 H397"/>
+  <path class="arrow" d="M520 336 V377"/>
+  <path class="arrow" d="M405 445 C348 456 302 493 267 500"/>
+  <path class="arrow" d="M322 546 H677"/>
+  <path class="return" d="M685 278 H643"/>
+  <path class="return" d="M635 410 C682 392 718 352 746 326"/>
+
+  <rect x="360" y="628" width="568" height="54" rx="18" class="note"/>
+  <text x="382" y="652" class="small">DTO = Data Transfer Object. Se suele mapear una entidad/model a DTO</text>
+  <text x="382" y="672" class="small">para no exponer directamente la tabla como contrato HTTP.</text>
+
+  <rect x="982" y="136" width="340" height="474" rx="28" class="panel"/>
+  <text x="1016" y="176" class="section">SOPORTE TRANSVERSAL</text>
+  <text x="1016" y="204" class="tiny">No son pasos del flujo. Estan disponibles para varias capas.</text>
+
+  <g transform="translate(1025,245)">
+    <rect width="254" height="78" rx="18" class="support"/>
+    <text x="20" y="32" class="body">core</text>
+    <text x="20" y="56" class="small">Configuracion central</text>
+  </g>
+
+  <g transform="translate(1025,365)">
+    <rect width="254" height="78" rx="18" class="support"/>
+    <text x="20" y="32" class="body">db</text>
+    <text x="20" y="56" class="small">Engine, session y Base</text>
+  </g>
+
+  <g transform="translate(1025,485)">
+    <rect width="254" height="78" rx="18" class="support"/>
+    <text x="20" y="32" class="body">enums</text>
+    <text x="20" y="56" class="small">Codigos conocidos</text>
+  </g>
+
+</svg>

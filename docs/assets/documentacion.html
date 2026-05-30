@@ -1,0 +1,1358 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RentalApi | Mapa vivo del proyecto</title>
+  <style>
+    :root {
+      --bg: #07111f;
+      --paper: #0e1b2d;
+      --paper-2: #12233a;
+      --ink: #eaf4ff;
+      --muted: #9fb2c8;
+      --line: rgba(158, 190, 220, .18);
+      --accent: #38bdf8;
+      --accent-2: #67e8f9;
+      --accent-3: #93c5fd;
+      --danger: #fb7185;
+      --ok: #86efac;
+      --shadow: 0 24px 80px rgba(0, 0, 0, .34);
+      --radius: 22px;
+      --mono: "Cascadia Mono", "Consolas", monospace;
+      --sans: "Segoe UI", Verdana, sans-serif;
+      --serif: Georgia, serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 8%, rgba(56, 189, 248, .18), transparent 26%),
+        radial-gradient(circle at 88% 12%, rgba(103, 232, 249, .11), transparent 30%),
+        linear-gradient(135deg, rgba(147, 197, 253, .08), transparent 45%),
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        var(--bg);
+      background-size: auto, auto, auto, 100% 42px, auto;
+      font-family: var(--sans);
+      line-height: 1.55;
+    }
+
+    a { color: inherit; }
+    code, pre { font-family: var(--mono); }
+    code {
+      padding: 2px 6px;
+      border: 1px solid rgba(158, 190, 220, .2);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, .07);
+      color: #dff6ff;
+      font-size: .92em;
+    }
+
+    pre {
+      overflow-x: auto;
+      margin: 12px 0 0;
+      padding: 15px;
+      border: 1px solid rgba(158, 190, 220, .18);
+      border-radius: 14px;
+      background: #050b14;
+      color: #edf7f4;
+      font-size: .92rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    aside {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 24px;
+      border-right: 1px solid var(--line);
+      background: rgba(7, 17, 31, .88);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      display: grid;
+      gap: 12px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .mark {
+      width: 50px;
+      height: 50px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #0284c7, #22d3ee);
+      color: #03111f;
+      font-weight: 900;
+      box-shadow: var(--shadow);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 1.35rem;
+      line-height: 1.1;
+    }
+
+    .brand p, .hint, .small, .card p, details p, li { color: var(--muted); }
+    .brand p { margin: 0; font-size: .92rem; }
+
+    .search-box {
+      margin: 18px 0;
+    }
+
+    .search-box input {
+      width: 100%;
+      min-height: 42px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255,255,255,.07);
+      color: var(--ink);
+      font: inherit;
+    }
+
+    nav {
+      display: grid;
+      gap: 8px;
+    }
+
+    nav a {
+      display: block;
+      padding: 10px 12px;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      color: var(--muted);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    nav a:hover, nav a.active {
+      border-color: rgba(56, 189, 248, .3);
+      background: rgba(56, 189, 248, .1);
+      color: var(--accent);
+    }
+
+    .side-card {
+      margin-top: 18px;
+      padding: 14px;
+      border: 1px solid rgba(103, 232, 249, .22);
+      border-radius: 16px;
+      background: rgba(103, 232, 249, .08);
+      font-size: .9rem;
+    }
+
+    main { min-width: 0; }
+
+    .hero {
+      padding: 70px 34px 36px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .inner {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      margin-bottom: 18px;
+      padding: 7px 11px;
+      border: 1px solid rgba(56, 189, 248, .28);
+      border-radius: 999px;
+      background: rgba(56, 189, 248, .1);
+      color: var(--accent);
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    h2, h3 { margin: 0; line-height: 1.12; }
+    .hero h2 {
+      max-width: 980px;
+      font-family: var(--serif);
+      font-size: clamp(2.5rem, 7vw, 5.7rem);
+      letter-spacing: -.04em;
+    }
+
+    .hero .lead {
+      max-width: 860px;
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 1.12rem;
+    }
+
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 40px;
+      padding: 9px 13px;
+      border: 1px solid rgba(158, 190, 220, .18);
+      border-radius: 12px;
+      background: rgba(255,255,255,.07);
+      color: var(--ink);
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .button.primary {
+      border-color: transparent;
+      background: linear-gradient(135deg, #0284c7, #22d3ee);
+      color: #03111f;
+    }
+
+    section {
+      padding: 42px 34px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 380px);
+      gap: 26px;
+      align-items: end;
+      margin-bottom: 22px;
+    }
+
+    .kicker {
+      margin: 0 0 8px;
+      color: var(--accent-2);
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .section-head h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.8rem, 3vw, 3rem);
+    }
+
+    .grid { display: grid; gap: 16px; align-items: start; }
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .card, details, .map-panel {
+      border: 1px solid rgba(158, 190, 220, .16);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(18, 35, 58, .92), rgba(10, 22, 38, .92));
+      box-shadow: 0 18px 50px rgba(0,0,0,.22);
+    }
+
+    .card { padding: 20px; }
+    .card h3 { margin-bottom: 8px; font-size: 1.05rem; }
+    .card p { margin: 0; }
+
+    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, .12);
+      color: var(--accent);
+      font-size: .78rem;
+      font-weight: 900;
+    }
+    .pill.orange { background: rgba(103,232,249,.12); color: var(--accent-2); }
+    .pill.blue { background: rgba(147,197,253,.12); color: var(--accent-3); }
+    .pill.red { background: rgba(251,113,133,.12); color: var(--danger); }
+
+    details { overflow: hidden; align-self: start; width: 100%; }
+    summary {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      padding: 17px 18px;
+      cursor: pointer;
+      list-style: none;
+      font-weight: 900;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after {
+      content: "+";
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: rgba(56,189,248,.12);
+      color: var(--accent);
+      font-weight: 900;
+    }
+    details[open] summary::after { content: "-"; }
+    .answer {
+      padding: 0 18px 18px;
+      border-top: 1px solid rgba(158, 190, 220, .14);
+    }
+    .answer p { margin: 14px 0 0; }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(130px, 1fr));
+      gap: 10px;
+      counter-reset: flow;
+    }
+    .flow-step {
+      position: relative;
+      padding: 16px;
+      border: 1px solid rgba(158, 190, 220, .16);
+      border-radius: 18px;
+      background: rgba(255,255,255,.06);
+    }
+    .flow-step::before {
+      counter-increment: flow;
+      content: counter(flow);
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 10px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #0284c7, #22d3ee);
+      color: #03111f;
+      font-weight: 900;
+    }
+
+    .terminal-grid {
+      display: grid;
+      grid-template-columns: 210px minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    .command-list {
+      display: grid;
+      gap: 10px;
+    }
+    .command-list button {
+      width: 100%;
+      text-align: left;
+      padding: 12px;
+      border: 1px solid rgba(158, 190, 220, .16);
+      border-radius: 12px;
+      background: rgba(255,255,255,.07);
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 800;
+    }
+    .command-list button.active {
+      background: var(--accent);
+      color: #03111f;
+    }
+
+    .diagram-box {
+      padding: 18px;
+      overflow: hidden;
+    }
+    .diagram-box img {
+      width: 100%;
+      max-height: 650px;
+      object-fit: contain;
+      display: block;
+      border-radius: 16px;
+      background: #050b14;
+    }
+
+    .interactive-diagram {
+      overflow: hidden;
+    }
+
+    .diagram-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(5, 11, 20, .55);
+    }
+
+    .diagram-title {
+      display: grid;
+      gap: 2px;
+    }
+
+    .diagram-title strong {
+      color: var(--ink);
+    }
+
+    .diagram-title span {
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    .diagram-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .diagram-actions button {
+      min-width: 38px;
+      min-height: 34px;
+      padding: 6px 10px;
+      border: 1px solid rgba(158, 190, 220, .18);
+      border-radius: 10px;
+      background: rgba(255,255,255,.07);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: .86rem;
+      font-weight: 800;
+    }
+
+    .diagram-actions button:hover {
+      border-color: rgba(56, 189, 248, .42);
+      background: rgba(56, 189, 248, .12);
+    }
+
+    .zoom-readout {
+      min-width: 58px;
+      color: var(--accent);
+      font-size: .86rem;
+      font-weight: 900;
+      text-align: right;
+    }
+
+    .diagram-frame {
+      position: relative;
+      height: min(72vh, 720px);
+      min-height: 460px;
+      overflow: hidden;
+      background:
+        linear-gradient(rgba(255, 255, 255, .04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .04) 1px, transparent 1px),
+        #050b14;
+      background-size: 36px 36px;
+    }
+
+    .diagram-frame canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .diagram-frame canvas.is-dragging {
+      cursor: grabbing;
+    }
+
+    .diagram-hint {
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      max-width: min(390px, calc(100% - 28px));
+      padding: 8px 10px;
+      border: 1px solid rgba(158, 190, 220, .18);
+      border-radius: 10px;
+      background: rgba(5, 11, 20, .82);
+      color: var(--muted);
+      font-size: .82rem;
+      pointer-events: none;
+    }
+
+    .layer-visual {
+      padding: 12px;
+      grid-column: 1 / -1;
+    }
+
+    .layer-visual img {
+      display: block;
+      width: 100%;
+      max-height: 780px;
+      object-fit: contain;
+      border-radius: 16px;
+      background: #050b14;
+    }
+
+    .folder-tree {
+      padding: 18px;
+      border-radius: 16px;
+      background: #050b14;
+      color: #edf7f4;
+      font-family: var(--mono);
+      font-size: .92rem;
+      overflow-x: auto;
+    }
+
+    .callout {
+      padding: 16px;
+      border-left: 5px solid var(--accent);
+      border-radius: 16px;
+      background: rgba(56,189,248,.09);
+    }
+    .callout.warn { border-left-color: var(--accent-2); background: rgba(103,232,249,.08); }
+    .callout.danger { border-left-color: var(--danger); background: rgba(251,113,133,.08); }
+
+    .decision-banner {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+      padding: 16px;
+      border: 1px solid rgba(56,189,248,.24);
+      border-radius: 20px;
+      background: rgba(56,189,248,.08);
+    }
+
+    .decision-banner div {
+      padding: 12px;
+      border: 1px solid rgba(158, 190, 220, .14);
+      border-radius: 14px;
+      background: rgba(5, 11, 20, .28);
+    }
+
+    .decision-banner strong {
+      color: var(--accent-2);
+    }
+
+    .hidden-by-search { display: none !important; }
+
+    footer {
+      padding: 28px 34px 48px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      aside { position: relative; height: auto; }
+      nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .section-head, .grid.two, .grid.three, .grid.four, .terminal-grid, .flow { grid-template-columns: 1fr; }
+      .decision-banner { grid-template-columns: 1fr; }
+      .hero, section { padding-left: 22px; padding-right: 22px; }
+    }
+
+    @media (max-width: 640px) {
+      nav { grid-template-columns: 1fr; }
+      .hero { padding-top: 38px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside>
+      <div class="brand">
+        <div class="mark">RA</div>
+        <h1>RentalApi<br>Mapa vivo</h1>
+        <p>Un indice interactivo para entender, levantar y modificar el proyecto sin perderse.</p>
+      </div>
+
+      <div class="search-box">
+        <input id="searchInput" type="search" placeholder="Buscar: docker, .env, service..." aria-label="Buscar en la documentacion">
+      </div>
+
+      <nav aria-label="Indice principal">
+        <a href="#inicio">Inicio</a>
+        <a href="#levantar">Levantar</a>
+        <a href="#conceptos">Conceptos</a>
+        <a href="#arquitectura">Arquitectura</a>
+        <a href="#flujo">Flujo request</a>
+        <a href="#dominio">Dominio</a>
+        <a href="#datos">Base de datos</a>
+        <a href="#swagger">Swagger</a>
+        <a href="#errores">Si falla</a>
+        <a href="#glosario">Glosario</a>
+      </nav>
+
+      <div class="side-card">
+        <strong>Como usar esto</strong><br>
+        Lee el camino rapido si solo queres levantar el proyecto. Si aparece una duda, abri la pregunta puntual.
+      </div>
+    </aside>
+
+    <main>
+      <header class="hero" id="inicio">
+        <div class="inner">
+          <div class="eyebrow">Documentacion viva del proyecto</div>
+          <h2>Un mapa mental para entender RentalApi a un click.</h2>
+          <p class="lead">
+            Esta pagina responde las dudas normales al entrar al proyecto: que es cada herramienta,
+            como se levanta, como fluye el codigo, donde viven las reglas y como leer la base de datos.
+          </p>
+          <div class="quick-actions">
+            <a class="button primary" href="#levantar">Quiero levantarlo</a>
+            <a class="button" href="#arquitectura">Quiero entender carpetas</a>
+            <a class="button" href="#dominio">Quiero ver entidades</a>
+            <a class="button" href="#errores">Tengo un error</a>
+          </div>
+        </div>
+      </header>
+
+      <section id="levantar" data-search-block>
+        <div class="inner">
+          <div class="section-head">
+            <div>
+              <p class="kicker">Primer contacto</p>
+              <h2>Como levantar el proyecto</h2>
+            </div>
+            <p class="hint">Ruta corta para tener MySQL y la API funcionando localmente.</p>
+          </div>
+
+          <div class="terminal-grid">
+            <div class="command-list" aria-label="Pasos">
+              <button class="active" type="button" data-command="env">1. Crear .env</button>
+              <button type="button" data-command="docker">2. Levantar MySQL</button>
+              <button type="button" data-command="venv">3. Crear entorno</button>
+              <button type="button" data-command="deps">4. Instalar dependencias</button>
+              <button type="button" data-command="api">5. Levantar API</button>
+            </div>
+            <div class="card">
+              <h3 id="commandTitle">Crear configuracion local</h3>
+              <p id="commandText">Copiamos la plantilla para crear el archivo que usa tu PC. Ese archivo no se sube al repo.</p>
+              <pre id="commandCode">Copy-Item .env.example .env</pre>
+              <div class="pill-row" id="commandTags">
+                <span class="pill">.env</span><span class="pill orange">config local</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid two" style="margin-top:16px">
+            <details>
+              <summary>Por que primero se crea `.env`?</summary>
+              <div class="answer">
+                <p>Porque la app necesita saber donde esta la base de datos. En este proyecto esa informacion vive en <code>DATABASE_URL</code>.</p>
+                <p><code>.env.example</code> es una plantilla segura para el repo. <code>.env</code> es tu copia local.</p>
+              </div>
+            </details>
+            <details>
+              <summary>Que deberia ver si salio bien?</summary>
+              <div class="answer">
+                <p>MySQL queda publicado en <code>localhost:3506</code>. La API queda en <code>http://127.0.0.1:8000</code>.</p>
+                <p>La documentacion interactiva de FastAPI vive en <code>http://127.0.0.1:8000/docs</code>.</p>
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section id="conceptos" data-search-block>
+        <div class="inner">
+          <div class="section-head">
+            <div>
+              <p class="kicker">Dudas frecuentes</p>
+              <h2>Que es cada cosa?</h2>
+            </div>
+            <p class="hint">Explicaciones cortas para no copiar comandos a ciegas.</p>
+          </div>
+
+          <div class="grid three">
+            <details>
+              <summary>Que es Docker?</summary>
+              <div class="answer">
+                <p>Docker permite ejecutar servicios en contenedores. En este proyecto lo usamos para tener MySQL listo sin instalar MySQL directamente en la PC.</p>
+                <p>La configuracion esta en <code>docker-compose.yml</code>.</p>
+              </div>
+            </details>
+            <details>
+              <summary>Que es Docker Compose?</summary>
+              <div class="answer">
+                <p>Compose lee <code>docker-compose.yml</code> y levanta los servicios definidos ahi. Hoy el servicio principal es <code>mysql</code>.</p>
+                <p>El comando clave es <code>docker compose up -d</code>.</p>
+              </div>
+            </details>
+            <details>
+              <summary>Que es un entorno virtual?</summary>
+              <div class="answer">
+                <p>Es una carpeta local donde Python instala dependencias solo para este proyecto. Aca se llama <code>.venv</code>.</p>
+                <p>Evita mezclar librerias de distintos proyectos.</p>
+              </div>
+            </details>
+            <details>
+              <summary>Que es requirements.txt?</summary>
+              <div class="answer">
+                <p>Es la lista de librerias que necesita la API: FastAPI, SQLAlchemy, Alembic, PyMySQL, Pydantic y otras.</p>
+                <p>Se instala con <code>python -m pip install -r requirements.txt</code>.</p>
+              </div>
+            </details>
+            <details>
+              <summary>Que es Uvicorn?</summary>
+              <div class="answer">
+                <p>Es el servidor que ejecuta FastAPI localmente. Sin Uvicorn, la app existe como codigo pero no queda escuchando requests HTTP.</p>
+                <p>Se ejecuta con <code>python -m uvicorn app.main:app --reload</code>.</p>
+              </div>
+            </details>
+            <details>
+              <summary>Que es Alembic?</summary>
+              <div class="answer">
+                <p>Es la herramienta de migraciones. Crea o actualiza las tablas de MySQL siguiendo los archivos de <code>alembic/versions</code>.</p>
+                <p>En esta app se ejecuta automaticamente al iniciar.</p>
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section id="arquitectura" data-search-block>
+        <div class="inner">
+          <div class="section-head">
+            <div>
+              <p class="kicker">Mapa de carpetas</p>
+              <h2>Donde vive cada responsabilidad</h2>
+            </div>
+            <p class="hint">La arquitectura esta separada por capas para que cada archivo tenga un rol claro.</p>
+          </div>
+
+          <div class="grid two">
+            <div class="map-panel layer-visual">
+              <img src="capas.svg" alt="Mapa visual de capas y responsabilidades de RentalApi">
+            </div>
+          </div>
+
+          <div class="decision-banner">
+            <div><strong>Endpoint</strong><br><span class="small">Si estas pensando en una URL, metodo HTTP, request o response, va en <code>controller</code>.</span></div>
+            <div><strong>Logica de negocio</strong><br><span class="small">Si estas validando, calculando o decidiendo estados, va en <code>services</code>.</span></div>
+            <div><strong>Query</strong><br><span class="small">Si estas consultando, guardando o actualizando datos en la DB, va en <code>repositories</code>.</span></div>
+            <div><strong>Tabla</strong><br><span class="small">Si estas representando una tabla o columna, va en <code>models</code>.</span></div>
+            <div><strong>Contrato HTTP</strong><br><span class="small">Si estas definiendo que datos entran o salen por la API, va en <code>dto</code>.</span></div>
+            <div><strong>Configuracion</strong><br><span class="small">Si es configuracion, session o codigos compartidos, mira <code>core</code>, <code>db</code> o <code>enums</code>.</span></div>
+          </div>
+
+          <div class="grid four" style="margin-top:16px">
+            <details>
+              <summary>Controller</summary>
+              <div class="answer"><p>Representa la ida y vuelta de un endpoint: recibe el request HTTP, llama al service y devuelve una response. No deberia tener reglas de negocio pesadas.</p></div>
+            </details>
+            <details>
+              <summary>Service</summary>
+              <div class="answer"><p>Es donde vive la logica importante: validar, decidir estados, calcular importes y coordinar repositories.</p></div>
+            </details>
+            <details>
+              <summary>Repository</summary>
+              <div class="answer"><p>Encapsula queries a la base. Una query es una consulta u operacion contra la DB, por ejemplo buscar clientes activos o guardar una renta.</p></div>
+            </details>
+            <details>
+              <summary>Model y DTO</summary>
+              <div class="answer"><p><code>Model</code> representa tablas. <code>DTO</code> significa <em>Data Transfer Object</em>: objeto para transferir datos entre la API y quien la consume.</p><p>Se suele mapear una entidad a un DTO para no exponer la tabla directamente como respuesta HTTP.</p></div>
+            </details>
+          </div>
+
+        </div>
+      </section>
+
+      <section id="flujo" data-search-block>
+        <div class="inner">
+          <div class="section-head">
+            <div>
+              <p class="kicker">Camino de un request</p>
+              <h2>Que pasa cuando alguien llama un endpoint?</h2>
+            </div>
+            <p class="hint">Pensalo como una cadena de responsabilidades, no como archivos sueltos.</p>
+          </div>
+
+          <div class="flow">
+            <div class="flow-step"><strong>Request DTO</strong><br><span class="small">Datos que llegan desde Swagger o cliente.</span></div>
+            <div class="flow-step"><strong>Controller</strong><br><span class="small">Recibe request, llama service y responde.</span></div>
+            <div class="flow-step"><strong>Service</strong><br><span class="small">Aplica reglas del caso de uso.</span></div>
+            <div class="flow-step"><strong>Repository</strong><br><span class="small">Consulta o guarda usando models.</span></div>
+            <div class="flow-step"><strong>Response DTO</strong><br><span class="small">Datos que vuelven por HTTP.</span></div>
+          </div>
+
+          <details style="margin-top:16px">
+            <summary>Ejemplo real: listar generos</summary>
+            <div class="answer">
+              <p><code>GET /catalogs/genres</code> entra por <code>catalog_controller.py</code>, llama a <code>CatalogService.list_genres()</code> y deberia usar <code>GenreRepository</code> para buscar generos activos.</p>
+              <p>Hoy varios services estan preparados con <code>pass</code>, porque son puntos de practica para implementar ordenadamente.</p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="dominio" data-search-block>
+        <div class="inner">
+          <div class="section-head">
+            <div>
+              <p class="kicker">Modelo del negocio</p>
+              <h2>Entidades principales</h2>
+            </div>
+            <p class="hint">El diagrama ayuda a ubicarse. Las migraciones y models son la fuente tecnica.</p>
+          </div>
+
+          <div class="map-panel interactive-diagram">
+            <div class="diagram-toolbar">
+              <div class="diagram-title">
+                <strong>Domain model / ERD</strong>
+                <span>Usa zoom, arrastre y capas para recorrer el modelo sin perder contexto.</span>
+              </div>
+              <div class="diagram-actions" aria-label="Controles del diagrama">
+                <button type="button" data-diagram-action="zoom-out">-</button>
+                <button type="button" data-diagram-action="zoom-in">+</button>
+                <button type="button" data-diagram-action="fit">Ajustar</button>
+                <button type="button" data-diagram-action="zones">Capas</button>
+                <button type="button" data-diagram-action="reset">100%</button>
+                <span class="zoom-readout" id="diagramZoom">100%</span>
+              </div>
+            </div>
+            <div class="diagram-frame">
+              <canvas id="diagramCanvas" aria-label="Diagrama interactivo de entidades"></canvas>
+              <div class="diagram-hint">Rueda del mouse para zoom, arrastra para moverte. El boton Capas muestra u oculta zonas de lectura.</div>
+            </div>
+          </div>
+
+          <div class="grid four" style="margin-top:16px">
+            <div class="card"><h3>Catalogos</h3><p>Valores de referencia: generos, plataformas, estados y tipos.</p></div>
+            <div class="card"><h3>Inventario</h3><p>Items alquilables y copias fisicas concretas.</p></div>
+            <div class="card"><h3>Rentas</h3><p>Cabecera de alquiler y detalles por copia.</p></div>
+            <div class="card"><h3>Seguridad</h3><p>Usuarios, roles y permisos preparados para crecer.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="datos" data-search-block>
+        <div class="inner">
+          <div class="section-head">
+            <div>
+              <p class="kicker">Base de datos</p>
+              <h2>Como se crea y se configura MySQL</h2>
+            </div>
+            <p class="hint">La conexion esta centralizada para evitar tener URLs repetidas en muchos archivos.</p>
+          </div>
+
+          <div class="grid two">
+            <div class="card">
+              <h3>Conexion</h3>
+              <p>La variable principal es <code>DATABASE_URL</code>. Vive en <code>.env</code> y se lee desde <code>app/core/config.py</code>.</p>
+              <pre>DATABASE_URL=mysql+pymysql://appuser:apppass@localhost:3506/rental_api</pre>
+            </div>
+            <div class="card">
+              <h3>Migraciones</h3>
+              <p>Al iniciar la API, <code>app/main.py</code> ejecuta Alembic hasta <code>head</code>.</p>
+              <pre>0001 inventory
+0002 security
+0003 rental
+0004 seed catalogs</pre>
+            </div>
+          </div>
+
+          <div class="grid two" style="margin-top:16px">
+            <details>
+              <summary>Por que hay `.env.example` y `.env`?</summary>
+              <div class="answer">
+                <p><code>.env.example</code> se sube al repo como ejemplo. <code>.env</code> queda en tu maquina y puede tener valores locales.</p>
+              </div>
+            </details>
+            <details>
+              <summary>Por que Docker Compose tambien usa `.env`?</summary>
+              <div class="answer">
+                <p>Para que el contenedor MySQL y la API compartan la misma configuracion base. Asi no queda todo escrito dos veces.</p>
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section id="swagger" data-search-block>
+        <div class="inner">
+          <div class="section-head">
+            <div>
+              <p class="kicker">Prueba funcional</p>
+              <h2>Que probar desde Swagger</h2>
+            </div>
+            <p class="hint">Swagger permite llamar endpoints desde el navegador mientras estas desarrollando.</p>
+          </div>
+
+          <div class="grid two" style="margin-bottom:16px">
+            <details>
+              <summary>Que es Swagger?</summary>
+              <div class="answer">
+                <p>Swagger es una pantalla web generada por FastAPI para ver y probar los endpoints disponibles.</p>
+                <p>Sirve para llamar la API desde el navegador sin armar requests manualmente con otra herramienta.</p>
+              </div>
+            </details>
+            <details>
+              <summary>Desde donde pruebo la API?</summary>
+              <div class="answer">
+                <p>Primero levanta la API con Uvicorn. Despues entra a <code>http://127.0.0.1:8000/docs</code>.</p>
+                <p>El endpoint simple para verificar que la app responde es <code>GET /health</code>.</p>
+              </div>
+            </details>
+          </div>
+
+          <div class="grid two">
+            <div class="card">
+              <h3>URLs utiles</h3>
+              <p><code>http://127.0.0.1:8000/docs</code></p>
+              <p><code>http://127.0.0.1:8000/health</code></p>
+            </div>
+            <div class="card">
+              <h3>Flujo minimo objetivo</h3>
+              <ol>
+                <li>Consultar catalogos.</li>
+                <li>Registrar cliente.</li>
+                <li>Registrar pelicula o videojuego.</li>
+                <li>Registrar copia fisica.</li>
+                <li>Crear renta.</li>
+                <li>Consultar detalles.</li>
+                <li>Devolver item.</li>
+              </ol>
+            </div>
+          </div>
+
+          <details style="margin-top:16px">
+            <summary>Por que algunos endpoints devuelven 501?</summary>
+            <div class="answer">
+              <p>Porque el controller ya esta conectado, pero el metodo del service todavia esta pendiente. Es una forma clara de decir: el endpoint existe, falta implementar la logica.</p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="errores" data-search-block>
+        <div class="inner">
+          <div class="section-head">
+            <div>
+              <p class="kicker">Rescate</p>
+              <h2>Si algo falla, mira aca</h2>
+            </div>
+            <p class="hint">Errores comunes y primera accion recomendada.</p>
+          </div>
+
+          <div class="grid two">
+            <details>
+              <summary>`DATABASE_URL is not configured`</summary>
+              <div class="answer">
+                <p>Falta crear <code>.env</code> o no tiene <code>DATABASE_URL</code>.</p>
+                <pre>Copy-Item .env.example .env</pre>
+              </div>
+            </details>
+            <details>
+              <summary>MySQL no conecta</summary>
+              <div class="answer">
+                <p>Primero revisa si el contenedor esta levantado y healthy.</p>
+                <pre>docker compose ps</pre>
+              </div>
+            </details>
+            <details>
+              <summary>Alembic no encuentra una revision vieja</summary>
+              <div class="answer">
+                <p>Tu volumen local puede tener una version anterior de migraciones. Si no tenes datos importantes, resetea la DB local.</p>
+                <pre>docker compose down -v
+docker compose up -d</pre>
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section id="glosario" data-search-block>
+        <div class="inner">
+          <div class="section-head">
+            <div>
+              <p class="kicker">Glosario minimo</p>
+              <h2>Palabras que conviene tener claras</h2>
+            </div>
+            <p class="hint">Definiciones cortas para leer codigo con menos friccion.</p>
+          </div>
+
+          <div class="grid three">
+            <details>
+              <summary>Endpoint</summary>
+              <div class="answer"><p>Es una URL de la API que representa una accion. Ejemplo: <code>GET /health</code> pregunta si la app esta viva.</p></div>
+            </details>
+            <details>
+              <summary>Request</summary>
+              <div class="answer"><p>Es lo que el cliente envia a la API: parametros, body, headers o filtros.</p></div>
+            </details>
+            <details>
+              <summary>Response</summary>
+              <div class="answer"><p>Es lo que la API devuelve: datos, estado HTTP y, si corresponde, un mensaje de error.</p></div>
+            </details>
+            <details>
+              <summary>DTO</summary>
+              <div class="answer"><p>Define el contrato de entrada o salida. No representa una tabla, representa como viajan los datos por HTTP.</p></div>
+            </details>
+            <details>
+              <summary>Model</summary>
+              <div class="answer"><p>Clase SQLAlchemy que representa una tabla. Por ejemplo, <code>Customer</code> representa <code>customers</code>.</p></div>
+            </details>
+            <details>
+              <summary>Migration</summary>
+              <div class="answer"><p>Archivo de Alembic que crea o modifica la estructura de base de datos de forma versionada.</p></div>
+            </details>
+            <details>
+              <summary>Seed</summary>
+              <div class="answer"><p>Carga inicial de datos conocidos, como generos, plataformas o estados. Evita cargar catalogos manualmente.</p></div>
+            </details>
+            <details>
+              <summary>Repository</summary>
+              <div class="answer"><p>Capa dedicada a consultar o guardar datos. Ayuda a que los services no repitan consultas.</p></div>
+            </details>
+            <details>
+              <summary>Service</summary>
+              <div class="answer"><p>Capa donde se toman decisiones de negocio: validar, calcular, cambiar estados y coordinar repositories.</p></div>
+            </details>
+            <details>
+              <summary>Query</summary>
+              <div class="answer"><p>Es una consulta u operacion contra la base de datos. Puede ser leer, insertar, actualizar o borrar datos.</p><p>Ejemplo: buscar todos los clientes activos.</p></div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        RentalApi - documentacion viva para consultar mientras se aprende y se implementa.
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    const commandData = {
+      env: {
+        title: "Crear configuracion local",
+        text: "Copiamos la plantilla para crear el archivo que usa tu PC. Ese archivo no se sube al repo.",
+        code: "Copy-Item .env.example .env",
+        tags: [".env", "config local"]
+      },
+      docker: {
+        title: "Levantar MySQL con Docker",
+        text: "Docker Compose crea el contenedor de MySQL usando docker-compose.yml y variables de .env.",
+        code: "docker compose up -d",
+        tags: ["Docker", "MySQL"]
+      },
+      venv: {
+        title: "Crear entorno virtual",
+        text: "El entorno virtual aisla las librerias de este proyecto para no mezclarlas con otros proyectos Python.",
+        code: "python -m venv .venv",
+        tags: ["Python", ".venv"]
+      },
+      deps: {
+        title: "Instalar dependencias",
+        text: "pip lee requirements.txt e instala las librerias necesarias dentro del entorno virtual.",
+        code: ".\\.venv\\Scripts\\python -m pip install -r requirements.txt",
+        tags: ["pip", "requirements.txt"]
+      },
+      api: {
+        title: "Levantar la API",
+        text: "Uvicorn ejecuta FastAPI. Al iniciar, la app corre migraciones de Alembic.",
+        code: ".\\.venv\\Scripts\\python -m uvicorn app.main:app --reload",
+        tags: ["FastAPI", "Uvicorn"]
+      }
+    };
+
+    document.querySelectorAll("[data-command]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const selected = commandData[button.dataset.command];
+        document.querySelectorAll("[data-command]").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        document.getElementById("commandTitle").textContent = selected.title;
+        document.getElementById("commandText").textContent = selected.text;
+        document.getElementById("commandCode").textContent = selected.code;
+        document.getElementById("commandTags").innerHTML = selected.tags.map((tag, index) => `<span class="pill ${index % 2 ? "orange" : ""}">${tag}</span>`).join("");
+      });
+    });
+
+    document.querySelectorAll("details").forEach((detail) => {
+      detail.addEventListener("toggle", () => {
+        if (!detail.open) return;
+
+        const group = detail.closest(".grid");
+        if (!group) return;
+
+        group.querySelectorAll(":scope > details").forEach((item) => {
+          if (item !== detail) item.open = false;
+        });
+      });
+    });
+
+    (() => {
+      const canvas = document.getElementById("diagramCanvas");
+      const zoomReadout = document.getElementById("diagramZoom");
+      if (!canvas || !zoomReadout) return;
+
+      const ctx = canvas.getContext("2d");
+      const image = new Image();
+      const state = {
+        scale: 1,
+        minScale: 0.08,
+        maxScale: 4,
+        offsetX: 0,
+        offsetY: 0,
+        dragging: false,
+        lastX: 0,
+        lastY: 0,
+        showZones: true
+      };
+
+      const zones = [
+        {
+          label: "catalog / inventory",
+          detail: "catalogos + items + copias",
+          x: -70,
+          y: -56,
+          width: 1768,
+          height: 965,
+          labelX: 1045,
+          labelY: 42,
+          stroke: "#38bdf8",
+          fill: "rgba(56, 189, 248, .10)"
+        },
+        {
+          label: "rentals",
+          detail: "clientes + rentas + detalles",
+          x: 2140,
+          y: 520,
+          width: 1560,
+          height: 1245,
+          labelX: 2215,
+          labelY: 570,
+          stroke: "#86efac",
+          fill: "rgba(134, 239, 172, .08)"
+        },
+        {
+          label: "security",
+          detail: "usuarios + roles + permisos",
+          x: 20,
+          y: 1150,
+          width: 1010,
+          height: 830,
+          labelX: 82,
+          labelY: 1195,
+          stroke: "#67e8f9",
+          fill: "rgba(103, 232, 249, .08)"
+        }
+      ];
+
+      function clamp(value, min, max) {
+        return Math.min(max, Math.max(min, value));
+      }
+
+      function roundedRect(x, y, width, height, radius) {
+        const r = Math.min(radius, width / 2, height / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + width - r, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+        ctx.lineTo(x + width, y + height - r);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+        ctx.lineTo(x + r, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+      }
+
+      function resizeCanvas() {
+        const rect = canvas.getBoundingClientRect();
+        const pixelRatio = window.devicePixelRatio || 1;
+        canvas.width = Math.max(1, Math.floor(rect.width * pixelRatio));
+        canvas.height = Math.max(1, Math.floor(rect.height * pixelRatio));
+        ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+        draw();
+      }
+
+      function drawZoneFills() {
+        if (!state.showZones) return;
+        zones.forEach((zone) => {
+          roundedRect(zone.x, zone.y, zone.width, zone.height, 22);
+          ctx.fillStyle = zone.fill;
+          ctx.fill();
+        });
+      }
+
+      function drawZoneLabels() {
+        if (!state.showZones) return;
+        zones.forEach((zone) => {
+          const lineWidth = 3 / state.scale;
+          roundedRect(zone.x, zone.y, zone.width, zone.height, 22);
+          ctx.strokeStyle = zone.stroke;
+          ctx.lineWidth = lineWidth;
+          ctx.setLineDash([14 / state.scale, 10 / state.scale]);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          const fontSize = 17 / state.scale;
+          const smallFontSize = 12 / state.scale;
+          const paddingX = 12 / state.scale;
+          const paddingY = 9 / state.scale;
+          const labelX = zone.labelX;
+          const labelY = zone.labelY;
+
+          ctx.font = `800 ${fontSize}px Segoe UI, sans-serif`;
+          const titleWidth = ctx.measureText(zone.label).width;
+          ctx.font = `600 ${smallFontSize}px Segoe UI, sans-serif`;
+          const detailWidth = ctx.measureText(zone.detail).width;
+          const boxWidth = Math.max(titleWidth, detailWidth) + paddingX * 2;
+          const boxHeight = (fontSize + smallFontSize) + paddingY * 3;
+
+          roundedRect(labelX, labelY, boxWidth, boxHeight, 8 / state.scale);
+          ctx.fillStyle = "rgba(5, 11, 20, .86)";
+          ctx.fill();
+          ctx.strokeStyle = zone.stroke;
+          ctx.lineWidth = 1.2 / state.scale;
+          ctx.stroke();
+
+          ctx.fillStyle = zone.stroke;
+          ctx.font = `800 ${fontSize}px Segoe UI, sans-serif`;
+          ctx.fillText(zone.label, labelX + paddingX, labelY + paddingY + fontSize);
+          ctx.fillStyle = "#d8ebff";
+          ctx.font = `600 ${smallFontSize}px Segoe UI, sans-serif`;
+          ctx.fillText(zone.detail, labelX + paddingX, labelY + paddingY * 2 + fontSize + smallFontSize);
+        });
+      }
+
+      function draw() {
+        const rect = canvas.getBoundingClientRect();
+        ctx.clearRect(0, 0, rect.width, rect.height);
+        ctx.save();
+        ctx.translate(state.offsetX, state.offsetY);
+        ctx.scale(state.scale, state.scale);
+
+        if (image.complete && image.naturalWidth) {
+          drawZoneFills();
+          ctx.drawImage(image, 0, 0);
+          drawZoneLabels();
+        } else {
+          ctx.fillStyle = "#9fb2c8";
+          ctx.font = "16px Segoe UI, sans-serif";
+          ctx.fillText("Cargando diagrama...", 24, 36);
+        }
+
+        ctx.restore();
+        zoomReadout.textContent = `${Math.round(state.scale * 100)}%`;
+      }
+
+      function fitDiagram() {
+        if (!image.naturalWidth) return;
+        const rect = canvas.getBoundingClientRect();
+        const padding = 26;
+        const scaleX = (rect.width - padding * 2) / image.naturalWidth;
+        const scaleY = (rect.height - padding * 2) / image.naturalHeight;
+        state.scale = clamp(Math.min(scaleX, scaleY), state.minScale, state.maxScale);
+        state.offsetX = (rect.width - image.naturalWidth * state.scale) / 2;
+        state.offsetY = (rect.height - image.naturalHeight * state.scale) / 2;
+        draw();
+      }
+
+      function zoomAt(clientX, clientY, factor) {
+        const rect = canvas.getBoundingClientRect();
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+        const nextScale = clamp(state.scale * factor, state.minScale, state.maxScale);
+        const worldX = (x - state.offsetX) / state.scale;
+        const worldY = (y - state.offsetY) / state.scale;
+        state.scale = nextScale;
+        state.offsetX = x - worldX * state.scale;
+        state.offsetY = y - worldY * state.scale;
+        draw();
+      }
+
+      function zoomCenter(factor) {
+        const rect = canvas.getBoundingClientRect();
+        zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, factor);
+      }
+
+      image.onload = () => {
+        resizeCanvas();
+        fitDiagram();
+      };
+      image.src = "entidades.svg";
+
+      canvas.addEventListener("wheel", (event) => {
+        event.preventDefault();
+        zoomAt(event.clientX, event.clientY, event.deltaY < 0 ? 1.12 : 0.88);
+      }, { passive: false });
+
+      canvas.addEventListener("pointerdown", (event) => {
+        state.dragging = true;
+        state.lastX = event.clientX;
+        state.lastY = event.clientY;
+        canvas.classList.add("is-dragging");
+        canvas.setPointerCapture(event.pointerId);
+      });
+
+      canvas.addEventListener("pointermove", (event) => {
+        if (!state.dragging) return;
+        state.offsetX += event.clientX - state.lastX;
+        state.offsetY += event.clientY - state.lastY;
+        state.lastX = event.clientX;
+        state.lastY = event.clientY;
+        draw();
+      });
+
+      canvas.addEventListener("pointerup", (event) => {
+        state.dragging = false;
+        canvas.classList.remove("is-dragging");
+        canvas.releasePointerCapture(event.pointerId);
+      });
+
+      canvas.addEventListener("pointercancel", () => {
+        state.dragging = false;
+        canvas.classList.remove("is-dragging");
+      });
+
+      canvas.addEventListener("dblclick", (event) => {
+        zoomAt(event.clientX, event.clientY, 1.45);
+      });
+
+      document.querySelectorAll("[data-diagram-action]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const action = button.getAttribute("data-diagram-action");
+          if (action === "zoom-in") zoomCenter(1.2);
+          if (action === "zoom-out") zoomCenter(0.8);
+          if (action === "fit") fitDiagram();
+          if (action === "zones") {
+            state.showZones = !state.showZones;
+            button.textContent = state.showZones ? "Capas" : "Capas off";
+            draw();
+          }
+          if (action === "reset") {
+            const rect = canvas.getBoundingClientRect();
+            state.scale = 1;
+            state.offsetX = (rect.width - image.naturalWidth) / 2;
+            state.offsetY = (rect.height - image.naturalHeight) / 2;
+            draw();
+          }
+        });
+      });
+
+      window.addEventListener("resize", resizeCanvas);
+    })();
+
+    const searchInput = document.getElementById("searchInput");
+    searchInput.addEventListener("input", () => {
+      const value = searchInput.value.trim().toLowerCase();
+      document.querySelectorAll("[data-search-block]").forEach((block) => {
+        const match = !value || block.innerText.toLowerCase().includes(value);
+        block.classList.toggle("hidden-by-search", !match);
+      });
+    });
+
+    const navLinks = [...document.querySelectorAll("nav a")];
+    const sections = navLinks.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        navLinks.forEach((link) => link.classList.toggle("active", link.getAttribute("href") === `#${entry.target.id}`));
+      });
+    }, { rootMargin: "-30% 0px -60% 0px", threshold: 0 });
+    sections.forEach((section) => observer.observe(section));
+  </script>
+</body>
+</html>

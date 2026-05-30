@@ -12,6 +12,12 @@ Documento complementario:
 
 - `endpoints_minimos_crear_renta.md`: flujo minimo para probar desde Swagger la creacion y devolucion de rentas.
 
+Material visual:
+
+- `assets/entidades.svg`: diagrama visual de entidades principales.
+- `assets/capas.svg`: mapa visual de capas y responsabilidades.
+- `assets/documentacion.html`: mapa vivo de consulta para entender, levantar y recorrer el proyecto.
+
 Seguimiento operativo:
 
 - Linear: `https://linear.app/federicobacelar/project/rentalapi-888ed6c0e001`

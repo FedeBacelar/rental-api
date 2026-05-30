@@ -2,6 +2,10 @@
 
 El dominio se divide en catalogos, inventario, rentas y seguridad.
 
+Diagrama visual de apoyo:
+
+- `assets/entidades.svg`
+
 ## Catalogos
 
 Los catalogos guardan valores de referencia usados por el sistema.
