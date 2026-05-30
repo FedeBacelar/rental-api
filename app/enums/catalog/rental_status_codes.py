@@ -1,0 +1,10 @@
+from enum import Enum
+
+
+class RentalStatusCode(str, Enum):
+    OPEN = "OPEN"
+    PARTIALLY_RETURNED = "PARTIALLY_RETURNED"
+    OVERDUE = "OVERDUE"
+    PARTIALLY_OVERDUE = "PARTIALLY_OVERDUE"
+    CLOSED = "CLOSED"
+    CANCELLED = "CANCELLED"

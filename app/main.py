@@ -1,0 +1,44 @@
+from pathlib import Path
+import time
+
+from alembic import command
+from alembic.config import Config
+from fastapi import FastAPI
+from sqlalchemy.exc import OperationalError
+
+from app.controller.catalog_controller import router as catalog_router
+from app.controller.customer_controller import router as customer_router
+from app.controller.health_controller import router as health_router
+from app.controller.inventory_controller import router as inventory_router
+from app.controller.rental_controller import router as rental_router
+
+
+def run_migrations() -> None:
+    base_path = Path(__file__).resolve().parent.parent
+    alembic_cfg = Config(str(base_path / "alembic.ini"))
+    last_error = None
+
+    for _ in range(15):
+        try:
+            command.upgrade(alembic_cfg, "head")
+            return
+        except OperationalError as exc:
+            last_error = exc
+            time.sleep(2)
+
+    raise RuntimeError("Database connection failed while running migrations") from last_error
+
+
+app = FastAPI(title="RentalApi", version="0.1.0")
+
+
+@app.on_event("startup")
+def startup_event() -> None:
+    run_migrations()
+
+
+app.include_router(health_router)
+app.include_router(catalog_router)
+app.include_router(customer_router)
+app.include_router(inventory_router)
+app.include_router(rental_router)
