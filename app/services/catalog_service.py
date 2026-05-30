@@ -6,6 +6,7 @@ from app.dto.catalog import (
     PlatformResponse,
     RentalCopyStatusResponse,
 )
+from app.repositories.catalog.genre_repository import GenreRepository
 
 
 class CatalogService:
@@ -17,7 +18,32 @@ class CatalogService:
         # Usar GenreRepository para obtener los generos activos.
         # Convertir el resultado al DTO GenreResponse con la estrategia que prefieras.
         # Devolver una lista de generos para que el controller responda al endpoint.
-        pass
+
+        # El repository concentra las consultas a la base de datos.
+        # Asi el service no necesita saber como se buscan los datos en MySQL.
+        genre_repository = GenreRepository(self.db)
+
+        # genres es una lista de objetos Genre.
+        # Cada objeto Genre representa una fila de la tabla genres.
+        genres = genre_repository.list_active()
+
+        # Esta lista va a contener la respuesta que vamos a devolver por la API.
+        # No devolvemos los objetos de la base directamente.
+        genre_responses = []
+
+        for genre in genres:
+            # Convertimos cada Genre en un GenreResponse.
+            # GenreResponse es el formato de respuesta que definimos para la API.
+            genre_response = GenreResponse(
+                id=genre.id,
+                code=genre.code,
+                name=genre.name,
+                is_active=genre.is_active,
+            )
+
+            genre_responses.append(genre_response)
+
+        return genre_responses
 
     def list_platforms(self) -> list[PlatformResponse]:
         # Issue 1.2: implementar este metodo.
