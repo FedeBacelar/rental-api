@@ -23,16 +23,8 @@ def search_customers(
     query: str,
     db: Session = Depends(get_db),
 ) -> list[CustomerResponse]:
-    # Issue 2.2: este endpoint ya esta conectado.
-    # La logica pendiente vive en CustomerService.search_customers().
     service = CustomerService(db)
     customers = service.search_customers(query)
-
-    if customers is None:
-        raise HTTPException(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED,
-            detail="Issue 2.2 pending implementation",
-        )
 
     return customers
 

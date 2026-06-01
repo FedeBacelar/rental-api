@@ -1,6 +1,6 @@
 ﻿from typing import Any, Optional
 
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from sqlalchemy.orm import Session
 
 from app.models.rental.customer import Customer
@@ -22,6 +22,10 @@ class CustomerRepository:
 
     def get_by_document_number(self, document_number: str) -> Optional[Customer]:
         return self.db.scalar(select(Customer).where(Customer.document_number == document_number))
+
+    def search_customers(self, query: str):
+        return list(self.db.scalars(select(Customer).where(or_(Customer.first_name.ilike(f"%{query}%"),Customer.last_name.ilike(f"%{query}%"),Customer.email.ilike(f"%{query}%"),Customer.document_number.ilike(f"%{query}%"),)).order_by(Customer.last_name.asc(), Customer.first_name.asc())
+        ).all())
 
     def list_active(self) -> list[Customer]:
         return list(self.db.scalars(select(Customer).where(Customer.is_active.is_(True)).order_by(Customer.last_name.asc(), Customer.first_name.asc())).all())

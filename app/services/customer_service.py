@@ -57,11 +57,24 @@ class CustomerService:
         )
 
     def search_customers(self, query: str) -> list[CustomerResponse]:
-        # Issue 2.2: implementar este metodo.
-        # Buscar clientes existentes segun el criterio recibido.
-        # Usar CustomerRepository y agregar metodos nuevos si hace falta.
-        # Convertir el resultado al DTO CustomerResponse con la estrategia que prefieras.
-        pass
+        customer_repository = CustomerRepository(self.db)
+        customers = customer_repository.search_customers(query)
+
+        return [
+            CustomerResponse(
+                id=customer.id,
+                status_id=customer.status_id,
+                first_name=customer.first_name,
+                last_name=customer.last_name,
+                document_number=customer.document_number,
+                email=customer.email,
+                phone=customer.phone,
+                address=customer.address,
+                is_active=customer.is_active,
+            )
+            for customer in customers
+    ]
+
 
     def list_active_customers(self) -> list[CustomerResponse]:
         # Issue 2.3: implementar este metodo.
