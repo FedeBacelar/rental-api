@@ -2,6 +2,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.dto.customer import CustomerCreateRequest, CustomerResponse
+
 from app.repositories.rental.customer_repository import CustomerRepository
 from app.repositories.catalog.customer_status_type_repository import CustomerStatusTypeRepository
 
@@ -75,10 +76,21 @@ class CustomerService:
             for customer in customers
     ]
 
+    def list_active_customers(self) -> list[CustomerResponse]: 
+        customer_repository = CustomerRepository(self.db)
+        customers = customer_repository.list_active()
 
-    def list_active_customers(self) -> list[CustomerResponse]:
-        # Issue 2.3: implementar este metodo.
-        # Usar CustomerRepository para obtener clientes activos.
-        # Convertir el resultado al DTO CustomerResponse con la estrategia que prefieras.
-        # Devolver una lista de clientes para que el controller responda al endpoint.
-        pass
+        return [
+            CustomerResponse(
+                id=customer.id,
+                status_id=customer.status_id,
+                first_name=customer.first_name,
+                last_name=customer.last_name,
+                document_number=customer.document_number,
+                email=customer.email,
+                phone=customer.phone,
+                address=customer.address,
+                is_active=customer.is_active,
+            )
+            for customer in customers
+        ]

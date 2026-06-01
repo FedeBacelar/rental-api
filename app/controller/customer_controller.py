@@ -15,6 +15,7 @@ def create_customer(
     db: Session = Depends(get_db),
 ) -> CustomerResponse:
     service = CustomerService(db)
+
     return service.create_customer(request)
 
 
@@ -28,18 +29,8 @@ def search_customers(
 
     return customers
 
-
 @router.get("/active", response_model=list[CustomerResponse])
 def list_active_customers(db: Session = Depends(get_db)) -> list[CustomerResponse]:
-    # Issue 2.3: este endpoint ya esta conectado.
-    # La logica pendiente vive en CustomerService.list_active_customers().
     service = CustomerService(db)
-    customers = service.list_active_customers()
 
-    if customers is None:
-        raise HTTPException(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED,
-            detail="Issue 2.3 pending implementation",
-        )
-
-    return customers
+    return service.list_active_customers()
