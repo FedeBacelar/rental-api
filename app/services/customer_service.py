@@ -1,6 +1,9 @@
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.dto.customer import CustomerCreateRequest, CustomerResponse
+from app.repositories.rental.customer_repository import CustomerRepository
+from app.repositories.catalog.customer_status_type_repository import CustomerStatusTypeRepository
 
 
 class CustomerService:
@@ -8,12 +11,50 @@ class CustomerService:
         self.db = db
 
     def create_customer(self, request: CustomerCreateRequest) -> CustomerResponse:
-        # Issue 2.1: implementar este metodo.
-        # Validar que no exista otro cliente con el mismo document_number.
-        # Usar CustomerStatusTypeRepository para obtener el estado inicial del cliente.
-        # Usar CustomerRepository para crear el cliente.
-        # Convertir el resultado al DTO CustomerResponse con la estrategia que prefieras.
-        pass
+        customer_repository = CustomerRepository(self.db)
+        status_repository = CustomerStatusTypeRepository(self.db)
+
+        existing_customer = customer_repository.get_by_document_number(
+            request.document_number
+        )
+
+        if existing_customer:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="A customer with this document number already exists",
+            )
+        
+        active_status = status_repository.get_by_code("ACTIVE")
+
+        if active_status is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Initial customer status ACTIVE was not found",
+            )
+        data = {
+            "status_id": active_status.id,
+            "first_name": request.first_name,
+            "last_name": request.last_name,
+            "document_number": request.document_number,
+            "email": request.email,
+            "phone": request.phone,
+            "address": request.address,
+            "is_active": True,
+        }
+
+        customer = customer_repository.create(data)
+
+        return CustomerResponse(
+            id=customer.id,
+            status_id=customer.status_id,
+            first_name=customer.first_name,
+            last_name=customer.last_name,
+            document_number=customer.document_number,
+            email=customer.email,
+            phone=customer.phone,
+            address=customer.address,
+            is_active=customer.is_active,
+        )
 
     def search_customers(self, query: str) -> list[CustomerResponse]:
         # Issue 2.2: implementar este metodo.

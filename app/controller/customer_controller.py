@@ -5,6 +5,7 @@ from app.db.session import get_db
 from app.dto.customer import CustomerCreateRequest, CustomerResponse
 from app.services.customer_service import CustomerService
 
+
 router = APIRouter(prefix="/customers", tags=["customers"])
 
 
@@ -13,18 +14,8 @@ def create_customer(
     request: CustomerCreateRequest,
     db: Session = Depends(get_db),
 ) -> CustomerResponse:
-    # Issue 2.1: este endpoint ya esta conectado.
-    # La logica pendiente vive en CustomerService.create_customer().
     service = CustomerService(db)
-    customer = service.create_customer(request)
-
-    if customer is None:
-        raise HTTPException(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED,
-            detail="Issue 2.1 pending implementation",
-        )
-
-    return customer
+    return service.create_customer(request)
 
 
 @router.get("/search", response_model=list[CustomerResponse])
