@@ -23,7 +23,7 @@ class CustomerRepository:
     def get_by_document_number(self, document_number: str) -> Optional[Customer]:
         return self.db.scalar(select(Customer).where(Customer.document_number == document_number))
 
-    def search_customers(self, query: str):
+    def search_customers(self, query: str) -> list[Customer]:
         return list(self.db.scalars(select(Customer).where(or_(Customer.first_name.ilike(f"%{query}%"),Customer.last_name.ilike(f"%{query}%"),Customer.email.ilike(f"%{query}%"),Customer.document_number.ilike(f"%{query}%"),)).order_by(Customer.last_name.asc(), Customer.first_name.asc())
         ).all())
 

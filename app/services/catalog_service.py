@@ -6,6 +6,7 @@ from app.dto.catalog import (
     PlatformResponse,
     RentalCopyStatusResponse,
 )
+from app.mappers.catalog import genres_to_genre_response
 from app.repositories.catalog.genre_repository import GenreRepository
 
 
@@ -27,23 +28,7 @@ class CatalogService:
         # Cada objeto Genre representa una fila de la tabla genres.
         genres = genre_repository.list_active()
 
-        # Esta lista va a contener la respuesta que vamos a devolver por la API.
-        # No devolvemos los objetos de la base directamente.
-        genre_responses = []
-
-        for genre in genres:
-            # Convertimos cada Genre en un GenreResponse.
-            # GenreResponse es el formato de respuesta que definimos para la API.
-            genre_response = GenreResponse(
-                id=genre.id,
-                code=genre.code,
-                name=genre.name,
-                is_active=genre.is_active,
-            )
-
-            genre_responses.append(genre_response)
-
-        return genre_responses
+        return genres_to_genre_response(genres)
 
     def list_platforms(self) -> list[PlatformResponse]:
         # Issue 1.2: implementar este metodo.

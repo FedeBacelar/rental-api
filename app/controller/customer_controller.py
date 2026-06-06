@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -28,6 +28,7 @@ def search_customers(
     customers = service.search_customers(query)
 
     return customers
+
 
 @router.get("/active", response_model=list[CustomerResponse])
 def list_active_customers(db: Session = Depends(get_db)) -> list[CustomerResponse]:

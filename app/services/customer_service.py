@@ -2,9 +2,12 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.dto.customer import CustomerCreateRequest, CustomerResponse
-
-from app.repositories.rental.customer_repository import CustomerRepository
+from app.mappers.customer import (
+    customer_to_customer_response,
+    customers_to_customer_response,
+)
 from app.repositories.catalog.customer_status_type_repository import CustomerStatusTypeRepository
+from app.repositories.rental.customer_repository import CustomerRepository
 
 
 class CustomerService:
@@ -24,7 +27,7 @@ class CustomerService:
                 status_code=status.HTTP_409_CONFLICT,
                 detail="A customer with this document number already exists",
             )
-        
+
         active_status = status_repository.get_by_code("ACTIVE")
 
         if active_status is None:
@@ -32,7 +35,8 @@ class CustomerService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Initial customer status ACTIVE was not found",
             )
-        data = {
+
+        customer_data = {
             "status_id": active_status.id,
             "first_name": request.first_name,
             "last_name": request.last_name,
@@ -43,54 +47,18 @@ class CustomerService:
             "is_active": True,
         }
 
-        customer = customer_repository.create(data)
+        customer = customer_repository.create(customer_data)
 
-        return CustomerResponse(
-            id=customer.id,
-            status_id=customer.status_id,
-            first_name=customer.first_name,
-            last_name=customer.last_name,
-            document_number=customer.document_number,
-            email=customer.email,
-            phone=customer.phone,
-            address=customer.address,
-            is_active=customer.is_active,
-        )
+        return customer_to_customer_response(customer)
 
     def search_customers(self, query: str) -> list[CustomerResponse]:
         customer_repository = CustomerRepository(self.db)
         customers = customer_repository.search_customers(query)
 
-        return [
-            CustomerResponse(
-                id=customer.id,
-                status_id=customer.status_id,
-                first_name=customer.first_name,
-                last_name=customer.last_name,
-                document_number=customer.document_number,
-                email=customer.email,
-                phone=customer.phone,
-                address=customer.address,
-                is_active=customer.is_active,
-            )
-            for customer in customers
-    ]
+        return customers_to_customer_response(customers)
 
-    def list_active_customers(self) -> list[CustomerResponse]: 
+    def list_active_customers(self) -> list[CustomerResponse]:
         customer_repository = CustomerRepository(self.db)
         customers = customer_repository.list_active()
 
-        return [
-            CustomerResponse(
-                id=customer.id,
-                status_id=customer.status_id,
-                first_name=customer.first_name,
-                last_name=customer.last_name,
-                document_number=customer.document_number,
-                email=customer.email,
-                phone=customer.phone,
-                address=customer.address,
-                is_active=customer.is_active,
-            )
-            for customer in customers
-        ]
+        return customers_to_customer_response(customers)
