@@ -21,6 +21,7 @@ from app.models.rental import (
 )
 from app.models.security import (
     Permission,
+    RefreshToken,
     Role,
     RolePermission,
     User,
@@ -33,6 +34,7 @@ __all__ = [
     "MovieDetail",
     "Permission",
     "Platform",
+    "RefreshToken",
     "Rental",
     "RentalCopy",
     "RentalCopyStatusType",
