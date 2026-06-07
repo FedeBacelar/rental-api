@@ -3,6 +3,8 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.enums.catalog import UserStatusCode
+from app.models.catalog.user_status_type import UserStatusType
 from app.models.security.user import User
 
 
@@ -27,7 +29,14 @@ class UserRepository:
         return self.db.scalar(select(User).where(User.email == email))
 
     def list_active(self) -> list[User]:
-        return list(self.db.scalars(select(User).where(User.is_active.is_(True)).order_by(User.username.asc())).all())
+        statement = (
+            select(User)
+            .join(UserStatusType, UserStatusType.id == User.status_id)
+            .where(UserStatusType.code == UserStatusCode.ACTIVE.value)
+            .order_by(User.username.asc())
+        )
+
+        return list(self.db.scalars(statement).all())
 
     def update(self, user: User, data: dict[str, Any]) -> User:
         for field, value in data.items():

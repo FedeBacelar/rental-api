@@ -8,6 +8,7 @@ from alembic.config import Config
 from fastapi import FastAPI
 from sqlalchemy.exc import OperationalError
 
+from app.controller.auth_controller import router as auth_router
 from app.controller.catalog_controller import router as catalog_router
 from app.controller.customer_controller import router as customer_router
 from app.controller.health_controller import router as health_router
@@ -42,6 +43,7 @@ def startup_event() -> None:
 
 
 app.include_router(health_router)
+app.include_router(auth_router)
 app.include_router(catalog_router)
 app.include_router(customer_router)
 app.include_router(inventory_router)

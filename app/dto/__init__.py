@@ -4,6 +4,7 @@ from app.dto.catalog import (
     PlatformResponse,
     RentalCopyStatusResponse,
 )
+from app.dto.auth import AuthenticatedUserResponse, LoginRequest, LoginResponse
 from app.dto.customer import CustomerCreateRequest, CustomerResponse
 from app.dto.inventory import (
     MovieCreateRequest,
@@ -22,10 +23,13 @@ from app.dto.rental import (
 )
 
 __all__ = [
+    "AuthenticatedUserResponse",
     "CustomerCreateRequest",
     "CustomerResponse",
     "CustomerStatusResponse",
     "GenreResponse",
+    "LoginRequest",
+    "LoginResponse",
     "MovieCreateRequest",
     "MovieResponse",
     "PlatformResponse",

@@ -10,6 +10,18 @@ load_dotenv()
 @dataclass(frozen=True)
 class Settings:
     database_url: str
+    jwt_secret_key: str
+    jwt_algorithm: str
+    access_token_expire_minutes: int
+    refresh_token_expire_days: int
+    auth_cookie_secure: bool
+
+
+def parse_bool(value: str | None, default: bool = False) -> bool:
+    if value is None:
+        return default
+
+    return value.lower() in {"1", "true", "yes", "on"}
 
 
 def get_settings() -> Settings:
@@ -17,7 +29,14 @@ def get_settings() -> Settings:
     if not database_url:
         raise RuntimeError("DATABASE_URL is not configured")
 
-    return Settings(database_url=database_url)
+    return Settings(
+        database_url=database_url,
+        jwt_secret_key=os.getenv("JWT_SECRET_KEY", "dev-secret-change-me-at-least-32-bytes"),
+        jwt_algorithm=os.getenv("JWT_ALGORITHM", "HS256"),
+        access_token_expire_minutes=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "15")),
+        refresh_token_expire_days=int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "7")),
+        auth_cookie_secure=parse_bool(os.getenv("AUTH_COOKIE_SECURE"), default=False),
+    )
 
 
 settings = get_settings()
