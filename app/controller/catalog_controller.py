@@ -15,8 +15,6 @@ router = APIRouter(prefix="/catalogs", tags=["catalogs"])
 
 @router.get("/genres", response_model=list[GenreResponse])
 def list_genres(db: Session = Depends(get_db)) -> list[GenreResponse]:
-    # Issue 1.1: este endpoint ya esta conectado.
-    # La logica pendiente vive en CatalogService.list_genres().
     service = CatalogService(db)
     genres = service.list_genres()
 
@@ -31,7 +29,6 @@ def list_genres(db: Session = Depends(get_db)) -> list[GenreResponse]:
 
 @router.get("/platforms", response_model=list[PlatformResponse])
 def list_platforms(db: Session = Depends(get_db)) -> list[PlatformResponse]:
-    # Issue 1.2: este endpoint ya esta conectado.
     # La logica pendiente vive en CatalogService.list_platforms().
     service = CatalogService(db)
     platforms = service.list_platforms()
@@ -39,7 +36,7 @@ def list_platforms(db: Session = Depends(get_db)) -> list[PlatformResponse]:
     if platforms is None:
         raise HTTPException(
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
-            detail="Issue 1.2 pending implementation",
+            detail="Issue 1.2",
         )
 
     return platforms

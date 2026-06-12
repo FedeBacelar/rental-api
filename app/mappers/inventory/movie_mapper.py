@@ -7,7 +7,6 @@ def movie_to_movie_response(
     rental_item: RentalItem,
     movie_detail: MovieDetail,
 ) -> MovieResponse:
-    # Combina los datos generales del item con los detalles especificos de pelicula.
     return MovieResponse(
         id=rental_item.id,
         genre_id=rental_item.genre_id,

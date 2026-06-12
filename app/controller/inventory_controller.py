@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.db.session import get_db
 from app.dto.inventory.movie_dto import MovieCreateRequest, MovieResponse
+from app.dto.inventory.videogame_dto import VideogameCreateRequest, VideogameResponse
 from app.services.inventory_service import InventoryService
 
 router = APIRouter(prefix="/inventory", tags=["inventory"])
@@ -16,3 +17,11 @@ def create_movie(
 
     return service.create_movie(request)
 
+@router.post("/videogames", response_model=VideogameResponse, status_code=status.HTTP_201_CREATED)
+def create_videogame(
+    request: VideogameCreateRequest,
+    db:Session = Depends(get_db),
+) -> VideogameResponse:
+    service = InventoryService(db)
+
+    return service.create_videogame(request)

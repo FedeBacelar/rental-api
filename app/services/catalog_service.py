@@ -6,8 +6,12 @@ from app.dto.catalog import (
     PlatformResponse,
     RentalCopyStatusResponse,
 )
-from app.mappers.catalog import genres_to_genre_response
+from app.mappers.catalog import (
+    genres_to_genre_response, 
+    platforms_to_platform_response,
+)
 from app.repositories.catalog.genre_repository import GenreRepository
+from app.repositories.catalog.platform_repository import PlatformRepository
 
 
 class CatalogService:
@@ -15,27 +19,22 @@ class CatalogService:
         self.db = db
 
     def list_genres(self) -> list[GenreResponse]:
-        # Issue 1.1: implementar este metodo.
-        # Usar GenreRepository para obtener los generos activos.
+    
         # Convertir el resultado al DTO GenreResponse con la estrategia que prefieras.
         # Devolver una lista de generos para que el controller responda al endpoint.
 
         # El repository concentra las consultas a la base de datos.
         # Asi el service no necesita saber como se buscan los datos en MySQL.
         genre_repository = GenreRepository(self.db)
-
-        # genres es una lista de objetos Genre.
-        # Cada objeto Genre representa una fila de la tabla genres.
         genres = genre_repository.list_active()
 
         return genres_to_genre_response(genres)
 
     def list_platforms(self) -> list[PlatformResponse]:
-        # Issue 1.2: implementar este metodo.
-        # Usar PlatformRepository para obtener las plataformas activas.
-        # Convertir el resultado al DTO PlatformResponse con la estrategia que prefieras.
-        # Devolver una lista de plataformas para que el controller responda al endpoint.
-        pass
+        platform_repository = PlatformRepository(self.db)
+        platforms = platform_repository.list_active()
+
+        return platforms_to_platform_response(platforms)
 
     def list_rental_copy_statuses(self) -> list[RentalCopyStatusResponse]:
         # Issue 1.3: implementar este metodo.

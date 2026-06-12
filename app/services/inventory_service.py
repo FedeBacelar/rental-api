@@ -2,12 +2,20 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.dto.inventory import MovieCreateRequest, MovieResponse
-from app.mappers.inventory import movie_to_movie_response
+from app.mappers.inventory import (
+    movie_to_movie_response,
+    videogame_to_videogame_response,
+)
 
+from app.dto.inventory.videogame_dto import VideogameCreateRequest, VideogameResponse
+
+from app.repositories.inventory.videogame_detail_repository import VideogameDetailRepository
 from app.repositories.inventory.movie_detail_repository import MovieDetailRepository
 from app.repositories.inventory.rental_item_repository import RentalItemRepository
+
 from app.repositories.catalog.rental_item_type_repository import RentalItemTypeRepository
 from app.repositories.catalog.genre_repository import GenreRepository
+from app.repositories.catalog.platform_repository import PlatformRepository
 
 
 class InventoryService:
@@ -70,3 +78,68 @@ class InventoryService:
             raise
 
         return movie_to_movie_response(rental_item, movie_detail)
+
+    def create_videogame(self, request: VideogameCreateRequest) -> VideogameResponse:
+        rental_item_repository = RentalItemRepository(self.db)
+        videogame_detail_repository = VideogameDetailRepository(self.db)
+        rental_item_type_repository = RentalItemTypeRepository(self.db)
+        genre_repository = GenreRepository(self.db)
+        platform_repository = PlatformRepository(self.db)
+
+        genre = genre_repository.get_by_id(request.genre_id)
+
+        if genre is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Genre was not found",
+            )
+        
+        platform = platform_repository.get_by_id(request.platform_id)
+
+        if platform is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Platform was not found",
+            )
+
+        item_type = rental_item_type_repository.get_by_code("VIDEOGAME")
+
+        if item_type is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Rental item type VIDEOGAME was not found",
+            )
+        
+        try:  
+            rental_item = rental_item_repository.create_pending(
+                {
+                    "item_type_id": item_type.id,
+                    "genre_id": request.genre_id,
+                    "title": request.title,
+                    "description": request.description,
+                    "age_rating": request.age_rating,
+                    "base_daily_price": request.base_daily_price,
+                    "late_fee_per_day": request.late_fee_per_day,
+                    "replacement_cost": request.replacement_cost,
+                    "is_active": True,
+                }
+            )
+
+            videogame_detail = videogame_detail_repository.create_pending(
+                {
+                    "rental_item_id": rental_item.id,
+                    "platform_id": request.platform_id,
+                    "publisher": request.publisher,
+                    "multiplayer": request.multiplayer,
+                }
+            )
+
+            self.db.commit()
+            self.db.refresh(rental_item)
+            self.db.refresh(videogame_detail)
+
+            return videogame_to_videogame_response(rental_item, videogame_detail)
+
+        except Exception:
+            self.db.rollback()
+            raise
