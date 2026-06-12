@@ -1,6 +1,72 @@
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
+
+from app.dto.inventory import MovieCreateRequest, MovieResponse
+from app.mappers.inventory import movie_to_movie_response
+
+from app.repositories.inventory.movie_detail_repository import MovieDetailRepository
+from app.repositories.inventory.rental_item_repository import RentalItemRepository
+from app.repositories.catalog.rental_item_type_repository import RentalItemTypeRepository
+from app.repositories.catalog.genre_repository import GenreRepository
 
 
 class InventoryService:
     def __init__(self, db: Session):
         self.db = db
+
+    def create_movie(self, request: MovieCreateRequest) -> MovieResponse:
+        rental_item_repository = RentalItemRepository(self.db)
+        movie_detail_repository = MovieDetailRepository(self.db)
+        genre_repository = GenreRepository(self.db)
+        rental_item_type_repository = RentalItemTypeRepository(self.db)
+
+        movie_type = rental_item_type_repository.get_by_code("MOVIE")
+
+        if movie_type is None: 
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Rental item type MOVIE was not found",
+            )
+        
+        genre = genre_repository.get_by_id(request.genre_id)
+
+        if genre is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Genre was not found",
+            )
+        
+        try:
+            rental_item = rental_item_repository.create_pending(
+                {
+                    "item_type_id": movie_type.id,
+                    "genre_id": request.genre_id,
+                    "title": request.title,
+                    "description": request.description,
+                    "age_rating": request.age_rating,
+                    "base_daily_price": request.base_daily_price,
+                    "late_fee_per_day": request.late_fee_per_day,
+                    "replacement_cost": request.replacement_cost,
+                    "is_active": True,
+                }
+            )
+
+            movie_detail = movie_detail_repository.create_pending(
+                {
+                    "rental_item_id": rental_item.id,
+                    "duration_minutes": request.duration_minutes,
+                    "director": request.director,
+                    "original_language": request.original_language,
+                }
+            )
+
+            self.db.commit()
+
+            self.db.refresh(rental_item)
+            self.db.refresh(movie_detail)
+
+        except Exception:
+            self.db.rollback()
+            raise
+
+        return movie_to_movie_response(rental_item, movie_detail)

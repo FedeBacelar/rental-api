@@ -30,5 +30,9 @@ class RentalItemRepository:
         self.db.refresh(item)
         return item
 
-
+    def create_pending(self, data: dict[str, Any]) -> RentalItem:
+        item = RentalItem(**data)
+        self.db.add(item)
+        self.db.flush()
+        return item
 

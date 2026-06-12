@@ -23,5 +23,8 @@ class MovieDetailRepository:
     def get_by_rental_item_id(self, rental_item_id: int) -> Optional[MovieDetail]:
         return self.db.scalar(select(MovieDetail).where(MovieDetail.rental_item_id == rental_item_id))
 
-
-
+    def create_pending(self, data: dict[str, Any]) -> MovieDetail:
+        detail = MovieDetail(**data)
+        self.db.add(detail)
+        self.db.flush()
+        return detail
