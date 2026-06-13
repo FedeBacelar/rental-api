@@ -2,9 +2,13 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.dto.inventory import MovieCreateRequest, MovieResponse
+from app.dto.inventory.rental_item_dto import RentalItemResponse
+from app.repositories.inventory import RentalItemRepository
+
 from app.mappers.inventory import (
     movie_to_movie_response,
     videogame_to_videogame_response,
+    rental_items_to_rental_item_response
 )
 
 from app.dto.inventory.videogame_dto import VideogameCreateRequest, VideogameResponse
@@ -79,12 +83,15 @@ class InventoryService:
 
         return movie_to_movie_response(rental_item, movie_detail)
 
+
     def create_videogame(self, request: VideogameCreateRequest) -> VideogameResponse:
         rental_item_repository = RentalItemRepository(self.db)
         videogame_detail_repository = VideogameDetailRepository(self.db)
         rental_item_type_repository = RentalItemTypeRepository(self.db)
         genre_repository = GenreRepository(self.db)
         platform_repository = PlatformRepository(self.db)
+
+        item_type = rental_item_type_repository.get_by_code("VIDEOGAME")
 
         genre = genre_repository.get_by_id(request.genre_id)
 
@@ -101,8 +108,6 @@ class InventoryService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Platform was not found",
             )
-
-        item_type = rental_item_type_repository.get_by_code("VIDEOGAME")
 
         if item_type is None:
             raise HTTPException(
@@ -138,8 +143,14 @@ class InventoryService:
             self.db.refresh(rental_item)
             self.db.refresh(videogame_detail)
 
-            return videogame_to_videogame_response(rental_item, videogame_detail)
-
         except Exception:
             self.db.rollback()
             raise
+        
+        return videogame_to_videogame_response(rental_item, videogame_detail)
+    
+    def list_rental_items(self) -> list[RentalItemResponse]:
+        item_repository = RentalItemRepository(self.db)
+        items = item_repository.list_active()
+
+        return rental_items_to_rental_item_response(items)
