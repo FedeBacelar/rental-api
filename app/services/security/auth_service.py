@@ -1,16 +1,16 @@
 from fastapi import HTTPException, Response, status
 from sqlalchemy.orm import Session
 
-from app.dto.auth import LoginRequest, LoginResponse
-from app.enums.catalog import UserStatusCode
-from app.mappers.auth import user_to_login_response
+from app.dto.security import LoginRequest, LoginResponse
+from app.enums.security import UserStatusCode
+from app.mappers.security import user_to_login_response
 from app.models.security.user import User
-from app.repositories.catalog.user_status_type_repository import UserStatusTypeRepository
 from app.repositories.security.refresh_token_repository import RefreshTokenRepository
 from app.repositories.security.role_repository import RoleRepository
 from app.repositories.security.user_repository import UserRepository
-from app.services.password_service import PasswordService
-from app.services.token_service import TokenService
+from app.repositories.security.user_status_type_repository import UserStatusTypeRepository
+from app.services.security.password_service import PasswordService
+from app.services.security.token_service import TokenService
 
 
 class AuthService:

@@ -3,7 +3,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models.catalog.rental_item_type import RentalItemType
+from app.models.inventory.rental_item_type import RentalItemType
 
 
 class RentalItemTypeRepository:

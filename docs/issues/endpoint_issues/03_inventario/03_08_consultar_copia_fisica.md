@@ -1,4 +1,4 @@
-﻿# 3.8 Consultar copia fisica
+# 3.8 Consultar copia fisica
 
 Trata de consultar una copia fisica existente.
 
@@ -12,9 +12,9 @@ Consultar una copia fisica puntual.
 
 ## Archivos disponibles
 
-- `app/controller/inventory_controller.py`
+- `app/controller/inventory/inventory_controller.py`
 - `app/dto/inventory/rental_copy_dto.py`
-- `app/services/inventory_service.py`
+- `app/services/inventory/inventory_service.py`
 - `app/repositories/inventory/rental_copy_repository.py`
 
 ## Contrato esperado

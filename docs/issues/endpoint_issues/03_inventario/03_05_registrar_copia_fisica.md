@@ -1,4 +1,4 @@
-﻿# 3.5 Registrar copia fisica
+# 3.5 Registrar copia fisica
 
 Trata de registrar una copia fisica de una pelicula o videojuego.
 
@@ -12,12 +12,12 @@ Registrar una unidad fisica concreta de un item alquilable.
 
 ## Archivos disponibles
 
-- `app/controller/inventory_controller.py`
+- `app/controller/inventory/inventory_controller.py`
 - `app/dto/inventory/rental_copy_dto.py`
-- `app/services/inventory_service.py`
+- `app/services/inventory/inventory_service.py`
 - `app/repositories/inventory/rental_item_repository.py`
 - `app/repositories/inventory/rental_copy_repository.py`
-- `app/repositories/catalog/rental_copy_status_type_repository.py`
+- `app/repositories/inventory/rental_copy_status_type_repository.py`
 
 ## Contrato esperado
 

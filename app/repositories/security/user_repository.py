@@ -3,8 +3,8 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.enums.catalog import UserStatusCode
-from app.models.catalog.user_status_type import UserStatusType
+from app.enums.security import UserStatusCode
+from app.models.security.user_status_type import UserStatusType
 from app.models.security.role import Role
 from app.models.security.user import User
 

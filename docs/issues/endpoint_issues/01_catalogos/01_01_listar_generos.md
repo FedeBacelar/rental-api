@@ -1,4 +1,4 @@
-﻿# 1.1 Listar generos
+# 1.1 Listar generos
 
 Trata de listar los generos disponibles para registrar peliculas o videojuegos.
 
@@ -12,9 +12,9 @@ Devolver la lista de generos disponibles.
 
 ## Archivos disponibles
 
-- `app/controller/catalog_controller.py`
+- `app/controller/catalog/catalog_controller.py`
 - `app/dto/catalog/genre_dto.py`
-- `app/services/catalog_service.py`
+- `app/services/catalog/catalog_service.py`
 - `app/repositories/catalog/genre_repository.py`
 
 ## Trabajo a realizar

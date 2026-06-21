@@ -10,7 +10,7 @@ from app.dto.catalog import (
     RentalCopyStatusResponse,
 )
 from app.enums.security import PermissionCode
-from app.services.catalog_service import CatalogService
+from app.services.catalog.catalog_service import CatalogService
 
 router = APIRouter(
     prefix="/catalogs",

@@ -1,4 +1,4 @@
-﻿# 2.1 Registrar cliente
+# 2.1 Registrar cliente
 
 Trata de crear un cliente nuevo en el sistema.
 
@@ -12,11 +12,11 @@ Registrar un cliente para poder asociarlo luego a una renta.
 
 ## Archivos disponibles
 
-- `app/controller/customer_controller.py`
+- `app/controller/customer/customer_controller.py`
 - `app/dto/customer/customer_dto.py`
-- `app/services/customer_service.py`
-- `app/repositories/rental/customer_repository.py`
-- `app/repositories/catalog/customer_status_type_repository.py`
+- `app/services/customer/customer_service.py`
+- `app/repositories/customer/customer_repository.py`
+- `app/repositories/customer/customer_status_type_repository.py`
 
 ## Trabajo a realizar
 

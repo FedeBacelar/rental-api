@@ -3,7 +3,7 @@
 from sqlalchemy import select, or_
 from sqlalchemy.orm import Session
 
-from app.models.rental.customer import Customer
+from app.models.customer.customer import Customer
 
 
 class CustomerRepository:

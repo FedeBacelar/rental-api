@@ -1,4 +1,4 @@
-﻿# 1.2 Listar plataformas
+# 1.2 Listar plataformas
 
 Trata de listar las plataformas disponibles para registrar videojuegos.
 
@@ -12,9 +12,9 @@ Devolver la lista de plataformas disponibles.
 
 ## Archivos disponibles
 
-- `app/controller/catalog_controller.py`
+- `app/controller/catalog/catalog_controller.py`
 - `app/dto/catalog/platform_dto.py`
-- `app/services/catalog_service.py`
+- `app/services/catalog/catalog_service.py`
 - `app/repositories/catalog/platform_repository.py`
 
 ## Trabajo a realizar

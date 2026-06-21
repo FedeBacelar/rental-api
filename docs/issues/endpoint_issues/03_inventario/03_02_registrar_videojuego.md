@@ -1,4 +1,4 @@
-﻿# 3.2 Registrar videojuego
+# 3.2 Registrar videojuego
 
 Trata de registrar un videojuego como item alquilable.
 
@@ -12,12 +12,12 @@ Registrar un videojuego en el inventario para que luego pueda tener copias fisic
 
 ## Archivos disponibles
 
-- `app/controller/inventory_controller.py`
+- `app/controller/inventory/inventory_controller.py`
 - `app/dto/inventory/videogame_dto.py`
-- `app/services/inventory_service.py`
+- `app/services/inventory/inventory_service.py`
 - `app/repositories/inventory/rental_item_repository.py`
 - `app/repositories/inventory/videogame_detail_repository.py`
-- `app/repositories/catalog/rental_item_type_repository.py`
+- `app/repositories/inventory/rental_item_type_repository.py`
 - `app/repositories/catalog/genre_repository.py`
 - `app/repositories/catalog/platform_repository.py`
 

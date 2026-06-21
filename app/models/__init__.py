@@ -1,23 +1,21 @@
 from app.models.catalog import (
-    CustomerStatusType,
     Genre,
     Platform,
-    RentalCopyStatusType,
-    RentalDetailStatusType,
-    RentalItemType,
-    RentalStatusType,
-    UserStatusType,
 )
+from app.models.customer import Customer, CustomerStatusType
 from app.models.inventory import (
     MovieDetail,
     RentalCopy,
+    RentalCopyStatusType,
     RentalItem,
+    RentalItemType,
     VideogameDetail,
 )
 from app.models.rental import (
-    Customer,
     Rental,
     RentalDetail,
+    RentalDetailStatusType,
+    RentalStatusType,
 )
 from app.models.security import (
     Permission,
@@ -25,6 +23,7 @@ from app.models.security import (
     Role,
     RolePermission,
     User,
+    UserStatusType,
 )
 
 __all__ = [

@@ -1,4 +1,4 @@
-from app.dto.auth import AuthenticatedUserResponse, LoginResponse
+from app.dto.security import AuthenticatedUserResponse, LoginResponse
 from app.models.security.user import User
 
 

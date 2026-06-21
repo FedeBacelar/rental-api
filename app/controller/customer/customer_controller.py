@@ -5,7 +5,7 @@ from app.core.auth import require_permission
 from app.db.session import get_db
 from app.dto.customer import CustomerCreateRequest, CustomerResponse
 from app.enums.security import PermissionCode
-from app.services.customer_service import CustomerService
+from app.services.customer.customer_service import CustomerService
 
 
 router = APIRouter(prefix="/customers", tags=["customers"])

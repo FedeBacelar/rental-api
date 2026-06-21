@@ -6,8 +6,8 @@ from app.mappers.customer import (
     customer_to_customer_response,
     customers_to_customer_response,
 )
-from app.repositories.catalog.customer_status_type_repository import CustomerStatusTypeRepository
-from app.repositories.rental.customer_repository import CustomerRepository
+from app.repositories.customer.customer_repository import CustomerRepository
+from app.repositories.customer.customer_status_type_repository import CustomerStatusTypeRepository
 
 
 class CustomerService:

@@ -1,4 +1,4 @@
-﻿# 3.3 Listar items alquilables
+# 3.3 Listar items alquilables
 
 Trata de listar peliculas y videojuegos cargados en el inventario.
 
@@ -12,9 +12,9 @@ Devolver los items alquilables cargados en el sistema.
 
 ## Archivos disponibles
 
-- `app/controller/inventory_controller.py`
+- `app/controller/inventory/inventory_controller.py`
 - `app/dto/inventory/rental_item_dto.py`
-- `app/services/inventory_service.py`
+- `app/services/inventory/inventory_service.py`
 - `app/repositories/inventory/rental_item_repository.py`
 
 ## Contrato esperado

@@ -7,15 +7,15 @@ from app.dto.security import (
     UserRoleUpdateRequest,
     UserStatusUpdateRequest,
 )
-from app.enums.catalog import UserStatusCode
+from app.enums.security import UserStatusCode
 from app.mappers.security import user_to_user_response, users_to_user_response
-from app.models.catalog.user_status_type import UserStatusType
 from app.models.security.role import Role
 from app.models.security.user import User
-from app.repositories.catalog.user_status_type_repository import UserStatusTypeRepository
+from app.models.security.user_status_type import UserStatusType
 from app.repositories.security.role_repository import RoleRepository
 from app.repositories.security.user_repository import UserRepository
-from app.services.password_service import PasswordService
+from app.repositories.security.user_status_type_repository import UserStatusTypeRepository
+from app.services.security.password_service import PasswordService
 
 
 class UserService:

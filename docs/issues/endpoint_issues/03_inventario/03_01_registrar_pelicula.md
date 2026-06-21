@@ -1,4 +1,4 @@
-﻿# 3.1 Registrar pelicula
+# 3.1 Registrar pelicula
 
 Trata de registrar una pelicula como item alquilable.
 
@@ -12,12 +12,12 @@ Registrar una pelicula en el inventario para que luego pueda tener copias fisica
 
 ## Archivos disponibles
 
-- `app/controller/inventory_controller.py`
+- `app/controller/inventory/inventory_controller.py`
 - `app/dto/inventory/movie_dto.py`
-- `app/services/inventory_service.py`
+- `app/services/inventory/inventory_service.py`
 - `app/repositories/inventory/rental_item_repository.py`
 - `app/repositories/inventory/movie_detail_repository.py`
-- `app/repositories/catalog/rental_item_type_repository.py`
+- `app/repositories/inventory/rental_item_type_repository.py`
 - `app/repositories/catalog/genre_repository.py`
 
 ## Contrato esperado

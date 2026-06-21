@@ -1,4 +1,4 @@
-﻿# 1.4 Listar estados de cliente
+# 1.4 Listar estados de cliente
 
 Trata de listar los estados posibles de un cliente.
 
@@ -12,10 +12,10 @@ Devolver la lista de estados de cliente disponibles.
 
 ## Archivos disponibles
 
-- `app/controller/catalog_controller.py`
+- `app/controller/catalog/catalog_controller.py`
 - `app/dto/catalog/customer_status_dto.py`
-- `app/services/catalog_service.py`
-- `app/repositories/catalog/customer_status_type_repository.py`
+- `app/services/catalog/catalog_service.py`
+- `app/repositories/customer/customer_status_type_repository.py`
 
 ## Trabajo a realizar
 

@@ -10,7 +10,7 @@ from app.dto.security import (
     UserStatusUpdateRequest,
 )
 from app.enums.security import PermissionCode
-from app.services.user_service import UserService
+from app.services.security.user_service import UserService
 
 
 router = APIRouter(

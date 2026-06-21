@@ -1,4 +1,4 @@
-﻿# 3.4 Consultar item alquilable
+# 3.4 Consultar item alquilable
 
 Trata de consultar el detalle de un item alquilable existente.
 
@@ -12,11 +12,11 @@ Consultar un item alquilable puntual.
 
 ## Archivos disponibles
 
-- `app/controller/inventory_controller.py`
+- `app/controller/inventory/inventory_controller.py`
 - `app/dto/inventory/rental_item_dto.py`
 - `app/dto/inventory/movie_dto.py`
 - `app/dto/inventory/videogame_dto.py`
-- `app/services/inventory_service.py`
+- `app/services/inventory/inventory_service.py`
 - `app/repositories/inventory/rental_item_repository.py`
 - `app/repositories/inventory/movie_detail_repository.py`
 - `app/repositories/inventory/videogame_detail_repository.py`

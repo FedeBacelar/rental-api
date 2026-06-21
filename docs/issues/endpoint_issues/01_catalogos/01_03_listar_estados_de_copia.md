@@ -1,4 +1,4 @@
-﻿# 1.3 Listar estados de copia
+# 1.3 Listar estados de copia
 
 Trata de listar los estados posibles de una copia fisica.
 
@@ -12,10 +12,10 @@ Devolver la lista de estados de copia disponibles.
 
 ## Archivos disponibles
 
-- `app/controller/catalog_controller.py`
+- `app/controller/catalog/catalog_controller.py`
 - `app/dto/catalog/rental_copy_status_dto.py`
-- `app/services/catalog_service.py`
-- `app/repositories/catalog/rental_copy_status_type_repository.py`
+- `app/services/catalog/catalog_service.py`
+- `app/repositories/inventory/rental_copy_status_type_repository.py`
 
 ## Trabajo a realizar
 

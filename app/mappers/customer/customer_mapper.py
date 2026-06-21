@@ -1,5 +1,5 @@
 from app.dto.customer import CustomerResponse
-from app.models.rental.customer import Customer
+from app.models.customer.customer import Customer
 
 
 def customer_to_customer_response(customer: Customer) -> CustomerResponse:

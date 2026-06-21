@@ -5,13 +5,12 @@ from fastapi.security import APIKeyCookie
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
-from app.enums.catalog import UserStatusCode
-from app.enums.security import PermissionCode
+from app.enums.security import PermissionCode, UserStatusCode
 from app.models.security.user import User
-from app.repositories.catalog.user_status_type_repository import UserStatusTypeRepository
 from app.repositories.security.role_repository import RoleRepository
 from app.repositories.security.user_repository import UserRepository
-from app.services.token_service import TokenService
+from app.repositories.security.user_status_type_repository import UserStatusTypeRepository
+from app.services.security.token_service import TokenService
 
 
 access_token_cookie = APIKeyCookie(

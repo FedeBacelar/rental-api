@@ -1,4 +1,4 @@
-﻿# 3.6 Listar copias por item
+# 3.6 Listar copias por item
 
 Trata de listar las copias fisicas asociadas a un item alquilable.
 
@@ -12,9 +12,9 @@ Devolver las copias fisicas registradas para un item alquilable.
 
 ## Archivos disponibles
 
-- `app/controller/inventory_controller.py`
+- `app/controller/inventory/inventory_controller.py`
 - `app/dto/inventory/rental_copy_dto.py`
-- `app/services/inventory_service.py`
+- `app/services/inventory/inventory_service.py`
 - `app/repositories/inventory/rental_item_repository.py`
 - `app/repositories/inventory/rental_copy_repository.py`
 

@@ -3,7 +3,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models.catalog.user_status_type import UserStatusType
+from app.models.security.user_status_type import UserStatusType
 
 
 class UserStatusTypeRepository:

@@ -1,4 +1,4 @@
-﻿# 2.3 Listar clientes activos
+# 2.3 Listar clientes activos
 
 Trata de listar los clientes activos disponibles para operar.
 
@@ -12,10 +12,10 @@ Devolver la lista de clientes activos.
 
 ## Archivos disponibles
 
-- `app/controller/customer_controller.py`
+- `app/controller/customer/customer_controller.py`
 - `app/dto/customer/customer_dto.py`
-- `app/services/customer_service.py`
-- `app/repositories/rental/customer_repository.py`
+- `app/services/customer/customer_service.py`
+- `app/repositories/customer/customer_repository.py`
 
 ## Trabajo a realizar
 

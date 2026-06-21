@@ -3,7 +3,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models.catalog.rental_status_type import RentalStatusType
+from app.models.rental.rental_status_type import RentalStatusType
 
 
 class RentalStatusTypeRepository:

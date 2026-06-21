@@ -2,8 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, Field
 
-from app.enums.catalog import UserStatusCode
-from app.enums.security import RoleCode
+from app.enums.security import RoleCode, UserStatusCode
 
 
 class UserCreateRequest(BaseModel):

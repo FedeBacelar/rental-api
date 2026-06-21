@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 
 from app.core.auth import refresh_token_cookie
 from app.db.session import get_db
-from app.dto.auth import LoginRequest, LoginResponse
-from app.services.auth_service import AuthService
+from app.dto.security import LoginRequest, LoginResponse
+from app.services.security.auth_service import AuthService
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
