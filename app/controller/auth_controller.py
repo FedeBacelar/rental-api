@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Cookie, Depends, Response, status
+from fastapi import APIRouter, Depends, Response, Security, status
 from sqlalchemy.orm import Session
 
+from app.core.auth import refresh_token_cookie
 from app.db.session import get_db
 from app.dto.auth import LoginRequest, LoginResponse
 from app.services.auth_service import AuthService
@@ -23,7 +24,7 @@ def login(
 @router.post("/refresh", response_model=LoginResponse)
 def refresh(
     response: Response,
-    refresh_token: str | None = Cookie(default=None),
+    refresh_token: str | None = Security(refresh_token_cookie),
     db: Session = Depends(get_db),
 ) -> LoginResponse:
     service = AuthService(db)
@@ -34,7 +35,7 @@ def refresh(
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 def logout(
     response: Response,
-    refresh_token: str | None = Cookie(default=None),
+    refresh_token: str | None = Security(refresh_token_cookie),
     db: Session = Depends(get_db),
 ) -> None:
     service = AuthService(db)

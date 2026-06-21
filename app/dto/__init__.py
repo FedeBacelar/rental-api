@@ -21,6 +21,12 @@ from app.dto.rental import (
     RentalResponse,
     ReturnRentalItemRequest,
 )
+from app.dto.security import (
+    UserCreateRequest,
+    UserResponse,
+    UserRoleUpdateRequest,
+    UserStatusUpdateRequest,
+)
 
 __all__ = [
     "AuthenticatedUserResponse",
@@ -43,4 +49,8 @@ __all__ = [
     "ReturnRentalItemRequest",
     "VideogameCreateRequest",
     "VideogameResponse",
+    "UserCreateRequest",
+    "UserResponse",
+    "UserRoleUpdateRequest",
+    "UserStatusUpdateRequest",
 ]

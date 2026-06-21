@@ -5,6 +5,7 @@ from app.services.inventory_service import InventoryService
 from app.services.password_service import PasswordService
 from app.services.rental_service import RentalService
 from app.services.token_service import TokenService
+from app.services.user_service import UserService
 
 __all__ = [
     "AuthService",
@@ -14,4 +15,5 @@ __all__ = [
     "PasswordService",
     "RentalService",
     "TokenService",
+    "UserService",
 ]

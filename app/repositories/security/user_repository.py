@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.enums.catalog import UserStatusCode
 from app.models.catalog.user_status_type import UserStatusType
+from app.models.security.role import Role
 from app.models.security.user import User
 
 
@@ -37,6 +38,19 @@ class UserRepository:
         )
 
         return list(self.db.scalars(statement).all())
+
+    def list_with_role_and_status(self) -> list[tuple[User, str, str]]:
+        statement = (
+            select(User, Role.code, UserStatusType.code)
+            .join(Role, Role.id == User.role_id)
+            .join(UserStatusType, UserStatusType.id == User.status_id)
+            .order_by(User.username.asc())
+        )
+
+        return [
+            (user, role_code, status_code)
+            for user, role_code, status_code in self.db.execute(statement).all()
+        ]
 
     def update(self, user: User, data: dict[str, Any]) -> User:
         for field, value in data.items():

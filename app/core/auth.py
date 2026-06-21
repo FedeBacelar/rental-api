@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
-from fastapi import Cookie, Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Security, status
+from fastapi.security import APIKeyCookie
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -13,6 +14,21 @@ from app.repositories.security.user_repository import UserRepository
 from app.services.token_service import TokenService
 
 
+access_token_cookie = APIKeyCookie(
+    name=TokenService.ACCESS_COOKIE_NAME,
+    scheme_name="AccessTokenCookie",
+    description="Cookie HttpOnly generada por POST /auth/login.",
+    auto_error=False,
+)
+
+refresh_token_cookie = APIKeyCookie(
+    name=TokenService.REFRESH_COOKIE_NAME,
+    scheme_name="RefreshTokenCookie",
+    description="Cookie HttpOnly usada por refresh y logout.",
+    auto_error=False,
+)
+
+
 @dataclass(frozen=True)
 class AuthenticatedUser:
     id: int
@@ -22,7 +38,7 @@ class AuthenticatedUser:
 
 
 def get_current_user(
-    access_token: str | None = Cookie(default=None),
+    access_token: str | None = Security(access_token_cookie),
     db: Session = Depends(get_db),
 ) -> AuthenticatedUser:
     if access_token is None:
@@ -41,13 +57,20 @@ def get_current_user(
             detail="User role is inactive",
         )
 
-    permissions = _get_permissions(payload)
+    token_permissions = _get_permissions(payload)
+    current_permissions = RoleRepository(db).list_permission_codes(role.id)
+
+    if payload.get("role") != role.code or set(token_permissions) != set(current_permissions):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Access token is outdated",
+        )
 
     return AuthenticatedUser(
         id=user.id,
         username=user.username,
         role=role.code,
-        permissions=permissions,
+        permissions=current_permissions,
     )
 
 

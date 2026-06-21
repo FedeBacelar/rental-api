@@ -14,6 +14,7 @@ from app.controller.customer_controller import router as customer_router
 from app.controller.health_controller import router as health_router
 from app.controller.inventory_controller import router as inventory_router
 from app.controller.rental_controller import router as rental_router
+from app.controller.user_controller import router as user_router
 
 
 def run_migrations() -> None:
@@ -48,3 +49,4 @@ app.include_router(catalog_router)
 app.include_router(customer_router)
 app.include_router(inventory_router)
 app.include_router(rental_router)
+app.include_router(user_router)

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.core.auth import require_permission
 from app.db.session import get_db
 from app.dto.catalog import (
     CustomerStatusResponse,
@@ -8,9 +9,14 @@ from app.dto.catalog import (
     PlatformResponse,
     RentalCopyStatusResponse,
 )
+from app.enums.security import PermissionCode
 from app.services.catalog_service import CatalogService
 
-router = APIRouter(prefix="/catalogs", tags=["catalogs"])
+router = APIRouter(
+    prefix="/catalogs",
+    tags=["catalogs"],
+    dependencies=[Depends(require_permission(PermissionCode.CATALOGS_READ))],
+)
 
 
 @router.get("/genres", response_model=list[GenreResponse])
