@@ -37,3 +37,12 @@ def list_rental_items(
     service = InventoryService(db)
 
     return service.list_rental_items()
+
+@router.get("/items/{item_id}", response_model=MovieResponse | VideogameResponse)
+def get_rental_item(
+    item_id: int,
+    db: Session = Depends(get_db),
+) -> MovieResponse | VideogameResponse:
+    service = InventoryService(db)
+
+    return service.get_rental_item(item_id)

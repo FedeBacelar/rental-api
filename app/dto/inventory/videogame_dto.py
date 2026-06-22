@@ -26,3 +26,5 @@ class VideogameResponse(BaseModel):
     platform_id: int
     publisher: str
     multiplayer: bool
+
+    is_active: bool

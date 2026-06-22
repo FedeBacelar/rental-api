@@ -19,4 +19,5 @@ def videogame_to_videogame_response(
         platform_id=videogame_detail.platform_id,
         publisher=videogame_detail.publisher,
         multiplayer=videogame_detail.multiplayer,
+        is_active=rental_item.is_active,
     )

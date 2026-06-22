@@ -5,6 +5,8 @@ from app.dto.inventory import MovieCreateRequest, MovieResponse
 from app.dto.inventory.rental_item_dto import RentalItemResponse
 from app.repositories.inventory import RentalItemRepository
 
+from app.enums import RentalItemTypeCode
+
 from app.mappers.inventory import (
     movie_to_movie_response,
     videogame_to_videogame_response,
@@ -154,3 +156,51 @@ class InventoryService:
         items = item_repository.list_active()
 
         return rental_items_to_rental_item_response(items)
+
+    def get_rental_item(self, item_id: int) -> MovieResponse | VideogameResponse:
+        item_repository = RentalItemRepository(self.db)
+        item_type_repository = RentalItemTypeRepository(self.db)
+        movie_repository = MovieDetailRepository(self.db)
+        videogame_repository = VideogameDetailRepository(self.db)
+
+        item = item_repository.get_by_id(item_id)
+
+        if item is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Rental item was not found",
+            )
+
+        item_type = item_type_repository.get_by_id(item.item_type_id)
+
+        if item_type is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Rental item type was not found",
+            )
+
+        if item_type.code == RentalItemTypeCode.MOVIE.value:
+            movie_detail = movie_repository.get_by_rental_item_id(item.id)
+
+            if movie_detail is None:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Movie details were not found",
+                )
+
+            return movie_to_movie_response(item, movie_detail)
+
+        if item_type.code == RentalItemTypeCode.VIDEOGAME.value:
+            videogame_detail = videogame_repository.get_by_rental_item_id(item.id)
+
+            if videogame_detail is None:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Videogame details were not found",
+                )
+            return videogame_to_videogame_response(item, videogame_detail)
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unsupported rental item type: {item_type.code}",
+        )
