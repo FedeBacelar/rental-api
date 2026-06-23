@@ -3,14 +3,21 @@ from sqlalchemy.orm import Session
 
 from app.db.session import get_db
 
-from app.dto.inventory.movie_dto import MovieCreateRequest, MovieResponse
-from app.dto.inventory.videogame_dto import VideogameCreateRequest, VideogameResponse
-from app.dto.inventory.rental_item_dto import RentalItemResponse
+from app.dto.inventory import (
+    MovieCreateRequest,
+    MovieResponse,
+    RentalCopyCreateRequest,
+    RentalCopyResponse,
+    RentalItemResponse,
+    VideogameCreateRequest,
+    VideogameResponse,
+)
 
 from app.services.inventory_service import InventoryService
 
 
 router = APIRouter(prefix="/inventory", tags=["inventory"])
+
 
 @router.post("/movies", response_model=MovieResponse, status_code=status.HTTP_201_CREATED)
 def create_movie(
@@ -21,22 +28,39 @@ def create_movie(
 
     return service.create_movie(request)
 
+
 @router.post("/videogames", response_model=VideogameResponse, status_code=status.HTTP_201_CREATED)
 def create_videogame(
     request: VideogameCreateRequest,
-    db:Session = Depends(get_db),
+    db: Session = Depends(get_db),
 ) -> VideogameResponse:
     service = InventoryService(db)
 
     return service.create_videogame(request)
 
-@router.get("/items", response_model=list [RentalItemResponse])
+
+@router.post(
+    "/copies",
+    response_model=RentalCopyResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_rental_copy(
+    request: RentalCopyCreateRequest,
+    db: Session = Depends(get_db),
+) -> RentalCopyResponse:
+    service = InventoryService(db)
+
+    return service.create_rental_copy(request)
+
+
+@router.get("/items", response_model=list[RentalItemResponse])
 def list_rental_items(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ) -> list[RentalItemResponse]:
     service = InventoryService(db)
 
     return service.list_rental_items()
+
 
 @router.get("/items/{item_id}", response_model=MovieResponse | VideogameResponse)
 def get_rental_item(

@@ -23,6 +23,18 @@ class RentalCopyRepository:
     def get_by_internal_code(self, internal_code: str) -> Optional[RentalCopy]:
         return self.db.scalar(select(RentalCopy).where(RentalCopy.internal_code == internal_code))
 
+    def get_by_item_id_and_copy_number(
+        self,
+        item_id: int,
+        copy_number: int,
+    ) -> Optional[RentalCopy]:
+        return self.db.scalar(
+            select(RentalCopy).where(
+                RentalCopy.rental_item_id == item_id,
+                RentalCopy.copy_number == copy_number,
+            )
+        )
+
     def list_by_item_id(self, item_id: int) -> list[RentalCopy]:
         return list(self.db.scalars(select(RentalCopy).where(RentalCopy.rental_item_id == item_id).order_by(RentalCopy.copy_number.asc())).all())
 
@@ -34,6 +46,3 @@ class RentalCopyRepository:
         self.db.commit()
         self.db.refresh(copy)
         return copy
-
-
-

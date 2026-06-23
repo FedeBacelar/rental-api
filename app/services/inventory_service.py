@@ -1,27 +1,35 @@
 from fastapi import HTTPException, status
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.dto.inventory import MovieCreateRequest, MovieResponse
-from app.dto.inventory.rental_item_dto import RentalItemResponse
-from app.repositories.inventory import RentalItemRepository
-
-from app.enums import RentalItemTypeCode
-
+from app.dto.inventory import (
+    MovieCreateRequest,
+    MovieResponse,
+    RentalCopyCreateRequest,
+    RentalCopyResponse,
+    RentalItemResponse,
+    VideogameCreateRequest,
+    VideogameResponse,
+)
+from app.enums import RentalCopyStatusCode, RentalItemTypeCode
 from app.mappers.inventory import (
     movie_to_movie_response,
+    rental_copy_to_rental_copy_response,
+    rental_items_to_rental_item_response,
     videogame_to_videogame_response,
-    rental_items_to_rental_item_response
 )
-
-from app.dto.inventory.videogame_dto import VideogameCreateRequest, VideogameResponse
-
-from app.repositories.inventory.videogame_detail_repository import VideogameDetailRepository
-from app.repositories.inventory.movie_detail_repository import MovieDetailRepository
-from app.repositories.inventory.rental_item_repository import RentalItemRepository
-
-from app.repositories.catalog.rental_item_type_repository import RentalItemTypeRepository
-from app.repositories.catalog.genre_repository import GenreRepository
-from app.repositories.catalog.platform_repository import PlatformRepository
+from app.repositories.catalog import (
+    GenreRepository,
+    PlatformRepository,
+    RentalCopyStatusTypeRepository,
+    RentalItemTypeRepository,
+)
+from app.repositories.inventory import (
+    MovieDetailRepository,
+    RentalCopyRepository,
+    RentalItemRepository,
+    VideogameDetailRepository,
+)
 
 
 class InventoryService:
@@ -204,3 +212,71 @@ class InventoryService:
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Unsupported rental item type: {item_type.code}",
         )
+
+    def create_rental_copy(
+        self,
+        request: RentalCopyCreateRequest,
+    ) -> RentalCopyResponse:
+        item_repository = RentalItemRepository(self.db)
+        copy_repository = RentalCopyRepository(self.db)
+        copy_status_repository = RentalCopyStatusTypeRepository(self.db)
+
+        rental_item = item_repository.get_by_id(request.rental_item_id)
+
+        if rental_item is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Rental item was not found",
+            )
+
+        existing_copy_number = copy_repository.get_by_item_id_and_copy_number(
+            request.rental_item_id,
+            request.copy_number,
+        )
+
+        if existing_copy_number is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Copy number already exists for this rental item",
+            )
+
+        existing_internal_code = copy_repository.get_by_internal_code(
+            request.internal_code
+        )
+
+        if existing_internal_code is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Internal code already exists",
+            )
+
+        available_status = copy_status_repository.get_by_code(
+            RentalCopyStatusCode.AVAILABLE.value
+        )
+
+        if available_status is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Rental copy status AVAILABLE was not found",
+            )
+
+        try:
+            rental_copy = copy_repository.create(
+                {
+                    "rental_item_id": request.rental_item_id,
+                    "status_id": available_status.id,
+                    "copy_number": request.copy_number,
+                    "internal_code": request.internal_code,
+                    "is_active": True,
+                }
+            )
+
+        except IntegrityError as exc:
+            self.db.rollback()
+
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Rental copy already exists",
+            ) from exc
+
+        return rental_copy_to_rental_copy_response(rental_copy)
