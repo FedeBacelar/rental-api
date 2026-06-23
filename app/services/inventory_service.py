@@ -14,9 +14,10 @@ from app.dto.inventory import (
 from app.enums import RentalCopyStatusCode, RentalItemTypeCode
 from app.mappers.inventory import (
     movie_to_movie_response,
-    rental_copy_to_rental_copy_response,
-    rental_items_to_rental_item_response,
     videogame_to_videogame_response,
+    rental_items_to_rental_item_response,
+    rental_copy_to_rental_copy_response,
+    rental_copies_to_rental_copy_responses,
 )
 from app.repositories.catalog import (
     GenreRepository,
@@ -280,3 +281,19 @@ class InventoryService:
             ) from exc
 
         return rental_copy_to_rental_copy_response(rental_copy)
+
+    def list_rental_copies_by_item(self, item_id: int) -> list[RentalCopyResponse]:
+        item_repository = RentalItemRepository(self.db)
+        copy_repository = RentalCopyRepository(self.db)
+
+        rental_item = item_repository.get_by_id(item_id)
+
+        if rental_item is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Rental item was not found",
+            )
+
+        rental_copies = copy_repository.list_by_item_id(item_id)
+
+        return rental_copies_to_rental_copy_responses(rental_copies)

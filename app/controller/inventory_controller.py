@@ -70,3 +70,16 @@ def get_rental_item(
     service = InventoryService(db)
 
     return service.get_rental_item(item_id)
+
+
+@router.get(
+    "/items/{item_id}/copies",
+    response_model=list[RentalCopyResponse],
+)
+def list_rental_copies_by_item(
+    item_id: int,
+    db: Session = Depends(get_db),
+) -> list[RentalCopyResponse]:
+    service = InventoryService(db)
+
+    return service.list_rental_copies_by_item(item_id)
