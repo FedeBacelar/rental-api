@@ -8,6 +8,7 @@ from app.dto.catalog import (
 )
 from app.mappers.catalog import genres_to_genre_response
 from app.repositories.catalog.genre_repository import GenreRepository
+from app.repositories.catalog.platform_repository import PlatformRepository
 
 
 class CatalogService:
@@ -35,7 +36,19 @@ class CatalogService:
         # Usar PlatformRepository para obtener las plataformas activas.
         # Convertir el resultado al DTO PlatformResponse con la estrategia que prefieras.
         # Devolver una lista de plataformas para que el controller responda al endpoint.
-        pass
+        repository = PlatformRepository(self.db)
+
+        platforms = repository.list_active()
+
+        return [
+            PlatformResponse(
+                id=platform.id,
+                code=platform.code,
+                name=platform.name,
+                is_active=platform.is_active,
+            )
+            for platform in platforms
+        ]
 
     def list_rental_copy_statuses(self) -> list[RentalCopyStatusResponse]:
         # Issue 1.3: implementar este metodo.
