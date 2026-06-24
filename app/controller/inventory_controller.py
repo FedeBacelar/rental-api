@@ -39,11 +39,7 @@ def create_videogame(
     return service.create_videogame(request)
 
 
-@router.post(
-    "/copies",
-    response_model=RentalCopyResponse,
-    status_code=status.HTTP_201_CREATED,
-)
+@router.post("/copies", response_model=RentalCopyResponse, status_code=status.HTTP_201_CREATED)
 def create_rental_copy(
     request: RentalCopyCreateRequest,
     db: Session = Depends(get_db),
@@ -60,15 +56,6 @@ def list_rental_items(
     service = InventoryService(db)
 
     return service.list_rental_items()
-
-
-@router.get("/copies/available", response_model=list[RentalCopyResponse])
-def list_available_rental_copies(
-    db: Session = Depends(get_db),
-) -> list[RentalCopyResponse]:
-    service = InventoryService(db)
-
-    return service.list_available_rental_copies()
 
 
 @router.get("/items/{item_id}", response_model=MovieResponse | VideogameResponse)
@@ -89,3 +76,22 @@ def list_rental_copies_by_item(
     service = InventoryService(db)
 
     return service.list_rental_copies_by_item(item_id)
+
+
+@router.get("/copies/available", response_model=list[RentalCopyResponse])
+def list_available_rental_copies(
+    db: Session = Depends(get_db),
+) -> list[RentalCopyResponse]:
+    service = InventoryService(db)
+
+    return service.list_available_rental_copies()
+
+
+@router.get("/copies/{copy_id}", response_model=RentalCopyResponse)
+def get_rental_copy(
+    copy_id: int,
+    db: Session = Depends(get_db),
+) -> RentalCopyResponse:
+    service = InventoryService(db)
+
+    return service.get_rental_copy(copy_id)

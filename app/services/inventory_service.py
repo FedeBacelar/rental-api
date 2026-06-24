@@ -282,6 +282,19 @@ class InventoryService:
 
         return rental_copy_to_rental_copy_response(rental_copy)
 
+    def get_rental_copy(self, copy_id: int) -> RentalCopyResponse:
+        copy_repository = RentalCopyRepository(self.db)
+
+        rental_copy = copy_repository.get_by_id(copy_id)
+
+        if rental_copy is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Rental copy was not found",
+            )
+
+        return rental_copy_to_rental_copy_response(rental_copy)
+
     def list_rental_copies_by_item(self, item_id: int) -> list[RentalCopyResponse]:
         item_repository = RentalItemRepository(self.db)
         copy_repository = RentalCopyRepository(self.db)
