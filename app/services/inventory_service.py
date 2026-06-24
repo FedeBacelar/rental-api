@@ -325,6 +325,8 @@ class InventoryService:
                 detail="Rental copy status AVAILABLE was not found",
             )
 
-        rental_copies = copy_repository.list_by_status_id(available_status.id)
+        rental_copies = copy_repository.list_active_by_status_id(
+            available_status.id
+        )
 
         return rental_copies_to_rental_copy_responses(rental_copies)

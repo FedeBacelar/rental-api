@@ -38,20 +38,15 @@ class CatalogService:
         return platforms_to_platform_response(platforms)
 
     def list_rental_copy_statuses(self) -> list[RentalCopyStatusResponse]:
-        # Issue 1.3: implementar este metodo.
-        # Usar RentalCopyStatusTypeRepository para obtener los estados de copia activos.
-        # Convertir el resultado al DTO RentalCopyStatusResponse con la estrategia que prefieras.
-        # Devolver una lista de estados para que el controller responda al endpoint.
         repository = RentalCopyStatusTypeRepository(self.db)
-
         statuses = repository.list_active()
 
         return [
             RentalCopyStatusResponse(
             id=status.id,
-            code=status.code,
-            name=status.name,
-            is_active=status.is_active,
+                code=status.code,
+                name=status.name,
+                is_active=status.is_active,
             )
             for status in statuses
         ]

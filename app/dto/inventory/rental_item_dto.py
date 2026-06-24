@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from decimal import Decimal
 
 
 class RentalItemResponse(BaseModel):
@@ -9,7 +8,7 @@ class RentalItemResponse(BaseModel):
     title: str
     description: str | None = None
     age_rating: str | None = None
-    base_daily_price: Decimal
-    late_fee_per_day: Decimal
-    replacement_cost: Decimal
+    base_daily_price: float
+    late_fee_per_day: float
+    replacement_cost: float
     is_active: bool
