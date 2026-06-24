@@ -8,6 +8,7 @@ from app.dto.catalog import (
 )
 from app.mappers.catalog import genres_to_genre_response
 from app.repositories.catalog.genre_repository import GenreRepository
+from app.repositories.catalog.rental_copy_status_type_repository import RentalCopyStatusTypeRepository
 
 
 class CatalogService:
