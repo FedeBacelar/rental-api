@@ -12,6 +12,7 @@ from app.mappers.catalog import (
 )
 from app.repositories.catalog.genre_repository import GenreRepository
 from app.repositories.catalog.platform_repository import PlatformRepository
+from app.repositories.catalog.rental_copy_status_type_repository import RentalCopyStatusTypeRepository
 
 
 class CatalogService:
@@ -41,7 +42,19 @@ class CatalogService:
         # Usar RentalCopyStatusTypeRepository para obtener los estados de copia activos.
         # Convertir el resultado al DTO RentalCopyStatusResponse con la estrategia que prefieras.
         # Devolver una lista de estados para que el controller responda al endpoint.
-        pass
+        repository = RentalCopyStatusTypeRepository(self.db)
+
+        statuses = repository.list_active()
+
+        return [
+            RentalCopyStatusResponse(
+            id=status.id,
+            code=status.code,
+            name=status.name,
+            is_active=status.is_active,
+            )
+            for status in statuses
+        ]
 
     def list_customer_statuses(self) -> list[CustomerStatusResponse]:
         # Issue 1.4: implementar este metodo.
