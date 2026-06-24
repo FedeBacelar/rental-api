@@ -297,3 +297,21 @@ class InventoryService:
         rental_copies = copy_repository.list_by_item_id(item_id)
 
         return rental_copies_to_rental_copy_responses(rental_copies)
+
+    def list_available_rental_copies(self) -> list[RentalCopyResponse]:
+        copy_repository = RentalCopyRepository(self.db)
+        copy_status_repository = RentalCopyStatusTypeRepository(self.db)
+
+        available_status = copy_status_repository.get_by_code(
+            RentalCopyStatusCode.AVAILABLE.value
+        )
+
+        if available_status is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Rental copy status AVAILABLE was not found",
+            )
+
+        rental_copies = copy_repository.list_by_status_id(available_status.id)
+
+        return rental_copies_to_rental_copy_responses(rental_copies)

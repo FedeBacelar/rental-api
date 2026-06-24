@@ -62,6 +62,15 @@ def list_rental_items(
     return service.list_rental_items()
 
 
+@router.get("/copies/available", response_model=list[RentalCopyResponse])
+def list_available_rental_copies(
+    db: Session = Depends(get_db),
+) -> list[RentalCopyResponse]:
+    service = InventoryService(db)
+
+    return service.list_available_rental_copies()
+
+
 @router.get("/items/{item_id}", response_model=MovieResponse | VideogameResponse)
 def get_rental_item(
     item_id: int,
@@ -72,10 +81,7 @@ def get_rental_item(
     return service.get_rental_item(item_id)
 
 
-@router.get(
-    "/items/{item_id}/copies",
-    response_model=list[RentalCopyResponse],
-)
+@router.get("/items/{item_id}/copies", response_model=list[RentalCopyResponse])
 def list_rental_copies_by_item(
     item_id: int,
     db: Session = Depends(get_db),
