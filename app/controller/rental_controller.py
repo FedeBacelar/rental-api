@@ -15,3 +15,11 @@ def create_rental(
 ) -> RentalResponse:
     service = RentalService(db)
     return service.create_rental(request)
+
+@router.get("/{rental_id}", response_model=RentalResponse)
+def get_rental(
+    rental_id: int,
+    db: Session = Depends(get_db),
+) -> RentalResponse:
+    service = RentalService(db)
+    return service.get_rental(rental_id)

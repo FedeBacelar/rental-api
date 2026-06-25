@@ -12,9 +12,9 @@ class RentalResponse(BaseModel):
     id: int
     customer_id: int
     status_id: int
+    status_code: str
     rental_date: date
     expected_return_date: date
     total_amount: float
 
     model_config = {"from_attributes": True}
-    

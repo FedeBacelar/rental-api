@@ -17,6 +17,7 @@ from app.repositories.catalog.rental_status_type_repository import RentalStatusT
 from app.repositories.inventory.rental_copy_repository import RentalCopyRepository
 from app.repositories.inventory.rental_item_repository import RentalItemRepository
 from app.repositories.rental.customer_repository import CustomerRepository
+from app.repositories.rental.rental_repository import RentalRepository
 
 
 class RentalService:
@@ -110,4 +111,34 @@ class RentalService:
             raise
 
         # --- Paso 9: devolver la renta creada ---
-        return RentalResponse.model_validate(rental)
+        return RentalResponse(
+            id=rental.id,
+            customer_id=rental.customer_id,
+            status_id=rental.status_id,
+            status_code=open_rental_status.code,
+            rental_date=rental.rental_date,
+            expected_return_date=rental.expected_return_date,
+            total_amount=rental.total_amount,
+        )
+
+    def get_rental(self, rental_id: int) -> RentalResponse:
+        rental_repo = RentalRepository(self.db)
+        rental_status_repo = RentalStatusTypeRepository(self.db)
+
+        # Buscar la renta por id
+        rental = rental_repo.get_by_id(rental_id)
+        if rental is None:
+            raise HTTPException(status_code=404, detail="La renta no existe")
+
+        # Traducir el status_id (numero) a su status_code (texto)
+        status = rental_status_repo.get_by_id(rental.status_id)
+
+        return RentalResponse(
+            id=rental.id,
+            customer_id=rental.customer_id,
+            status_id=rental.status_id,
+            status_code=status.code,
+            rental_date=rental.rental_date,
+            expected_return_date=rental.expected_return_date,
+            total_amount=rental.total_amount,
+        )
