@@ -1,16 +1,23 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
+from app.core.auth import require_permission
 from app.db.session import get_db
 from app.dto.rental.rental_detail_dto import RentalDetailResponse
 from app.dto.rental.rental_dto import RentalCreateRequest, RentalResponse
 from app.dto.rental.rental_return_dto import ReturnRentalItemRequest
+from app.enums.security import PermissionCode
 from app.services.rental.rental_service import RentalService
 
 router = APIRouter(prefix="/rentals", tags=["rentals"])
 
 
-@router.post("", response_model=RentalResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    response_model=RentalResponse,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_permission(PermissionCode.RENTALS_MANAGE))],
+)
 def create_rental(
     request: RentalCreateRequest,
     db: Session = Depends(get_db),
@@ -19,7 +26,11 @@ def create_rental(
     return service.create_rental(request)
 
 
-@router.get("/{rental_id}", response_model=RentalResponse)
+@router.get(
+    "/{rental_id}",
+    response_model=RentalResponse,
+    dependencies=[Depends(require_permission(PermissionCode.RENTALS_READ))],
+)
 def get_rental(
     rental_id: int,
     db: Session = Depends(get_db),
@@ -31,6 +42,7 @@ def get_rental(
 @router.post(
     "/details/{rental_detail_id}/return",
     response_model=RentalDetailResponse,
+    dependencies=[Depends(require_permission(PermissionCode.RENTALS_MANAGE))],
 )
 def return_rental_item(
     rental_detail_id: int,

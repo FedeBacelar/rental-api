@@ -68,6 +68,46 @@ Al iniciar, la aplicacion ejecuta las migraciones de Alembic para crear o actual
 - Swagger UI: `http://127.0.0.1:8000/docs`
 - Health check: `http://127.0.0.1:8000/health`
 
+## Usuarios y permisos de desarrollo
+
+Las migraciones seedean tres usuarios para probar seguridad desde Swagger.
+
+Todos usan la misma password de desarrollo:
+
+```text
+1234
+```
+
+Usuarios:
+
+| Usuario | Rol | Uso esperado |
+| --- | --- | --- |
+| `admin` | `ADMIN` | Administracion completa del sistema. |
+| `operator` | `OPERATOR` | Operacion diaria: clientes, inventario y rentas. |
+| `readonly` | `READ_ONLY` | Consulta limitada de catalogos e inventario. |
+
+Permisos disponibles:
+
+| Permiso | Alcance |
+| --- | --- |
+| `users:manage` | Crear/listar/cambiar rol o estado de usuarios. |
+| `roles:manage` | Administrar roles y permisos. |
+| `catalogs:read` | Consultar catalogos. |
+| `customers:read` | Consultar clientes. |
+| `customers:manage` | Crear o administrar clientes. |
+| `inventory:read` | Consultar inventario. |
+| `inventory:manage` | Crear peliculas, videojuegos y copias. |
+| `rentals:read` | Consultar rentas. |
+| `rentals:manage` | Crear rentas y devolver items. |
+
+Permisos por rol:
+
+| Rol | Permisos |
+| --- | --- |
+| `ADMIN` | Todos los permisos. |
+| `OPERATOR` | `catalogs:read`, `customers:read`, `customers:manage`, `inventory:read`, `inventory:manage`, `rentals:read`, `rentals:manage`. |
+| `READ_ONLY` | `catalogs:read`, `inventory:read`. |
+
 ## Documentacion
 
 - `docs/README.md`: indice de documentacion escrita.

@@ -15,7 +15,8 @@ branch_labels = None
 depends_on = None
 
 
-DEFAULT_PASSWORD_HASH = "$2b$12$tlR.EcknAN60yvIVA9IHXu28YOBqnnmrSjmX4XM9H4ucB9XTkNgDq"
+# Password de desarrollo para usuarios seedeados: 1234
+DEFAULT_PASSWORD_HASH = "$2b$12$.y1SmZCTQ517I.FE6zaItOhpZSFOcQ1A.ozhFs1TRw1fud77grsyG"
 
 
 roles_table = sa.table(
