@@ -66,6 +66,8 @@ Regla aplicada:
 
 - Busca rentas `OPEN` con `expected_return_date < hoy`.
 - Cambia esas rentas a `OVERDUE`.
+- Busca rentas `PARTIALLY_RETURNED` con `expected_return_date < hoy`.
+- Cambia esas rentas a `PARTIALLY_OVERDUE`.
 - Cambia sus detalles `RENTED` a `OVERDUE`.
 - No modifica las copias fisicas: siguen `RENTED`.
 - No calcula importes ni mora. Los importes finales se calculan al devolver el item.

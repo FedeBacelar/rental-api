@@ -39,15 +39,15 @@ class RentalRepository:
             ).all()
         )
 
-    def list_open_overdue(
+    def list_overdue_by_status_ids(
         self,
-        open_status_id: int,
+        status_ids: list[int],
         today: date,
     ) -> list[Rental]:
         return list(
             self.db.scalars(
                 select(Rental).where(
-                    Rental.status_id == open_status_id,
+                    Rental.status_id.in_(status_ids),
                     Rental.expected_return_date < today,
                 )
             ).all()

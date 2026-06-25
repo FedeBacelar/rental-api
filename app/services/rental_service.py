@@ -1,10 +1,12 @@
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
+from app.dto.rental.rental_detail_dto import RentalDetailResponse
 from app.dto.rental.rental_dto import RentalCreateRequest, RentalResponse
+from app.dto.rental.rental_return_dto import ReturnRentalItemRequest
 from app.enums.catalog.customer_status_codes import CustomerStatusCode
 from app.enums.catalog.rental_copy_status_codes import RentalCopyStatusCode
 from app.enums.catalog.rental_detail_status_codes import RentalDetailStatusCode
@@ -35,27 +37,34 @@ class RentalService:
         detail_repo = RentalDetailRepository(self.db)
 
         open_rental_status = rental_status_repo.get_by_code(RentalStatusCode.OPEN.value)
+        partially_returned_status = rental_status_repo.get_by_code(RentalStatusCode.PARTIALLY_RETURNED.value)
         overdue_rental_status = rental_status_repo.get_by_code(RentalStatusCode.OVERDUE.value)
+        partially_overdue_status = rental_status_repo.get_by_code(RentalStatusCode.PARTIALLY_OVERDUE.value)
         rented_detail_status = detail_status_repo.get_by_code(RentalDetailStatusCode.RENTED.value)
         overdue_detail_status = detail_status_repo.get_by_code(RentalDetailStatusCode.OVERDUE.value)
 
         required_statuses = [
             open_rental_status,
+            partially_returned_status,
             overdue_rental_status,
+            partially_overdue_status,
             rented_detail_status,
             overdue_detail_status,
         ]
         if any(status is None for status in required_statuses):
             raise RuntimeError("Faltan estados base para marcar rentas vencidas")
 
-        overdue_rentals = rental_repo.list_open_overdue(
-            open_status_id=open_rental_status.id,
+        overdue_rentals = rental_repo.list_overdue_by_status_ids(
+            status_ids=[open_rental_status.id, partially_returned_status.id],
             today=today,
         )
 
         updated_details_count = 0
         for rental in overdue_rentals:
-            rental.status_id = overdue_rental_status.id
+            if rental.status_id == partially_returned_status.id:
+                rental.status_id = partially_overdue_status.id
+            else:
+                rental.status_id = overdue_rental_status.id
 
             details = detail_repo.list_by_rental_id_and_status_id(
                 rental_id=rental.id,
@@ -216,4 +225,133 @@ class RentalService:
             rental_date=rental.rental_date,
             expected_return_date=rental.expected_return_date,
             total_amount=rental.total_amount,
+        )
+
+    def return_rental_item(
+        self,
+        rental_detail_id: int,
+        request: ReturnRentalItemRequest,
+    ) -> RentalDetailResponse:
+        return_date = request.actual_return_date or date.today()
+
+        detail_repo = RentalDetailRepository(self.db)
+        rental_repo = RentalRepository(self.db)
+        copy_repo = RentalCopyRepository(self.db)
+        detail_status_repo = RentalDetailStatusTypeRepository(self.db)
+        rental_status_repo = RentalStatusTypeRepository(self.db)
+        copy_status_repo = RentalCopyStatusTypeRepository(self.db)
+
+        rented_detail_status = detail_status_repo.get_by_code(RentalDetailStatusCode.RENTED.value)
+        overdue_detail_status = detail_status_repo.get_by_code(RentalDetailStatusCode.OVERDUE.value)
+        returned_detail_status = detail_status_repo.get_by_code(RentalDetailStatusCode.RETURNED.value)
+        lost_detail_status = detail_status_repo.get_by_code(RentalDetailStatusCode.LOST.value)
+
+        rented_copy_status = copy_status_repo.get_by_code(RentalCopyStatusCode.RENTED.value)
+        final_copy_status = copy_status_repo.get_by_code(request.copy_status_code)
+
+        closed_rental_status = rental_status_repo.get_by_code(RentalStatusCode.CLOSED.value)
+        partially_returned_status = rental_status_repo.get_by_code(RentalStatusCode.PARTIALLY_RETURNED.value)
+        partially_overdue_status = rental_status_repo.get_by_code(RentalStatusCode.PARTIALLY_OVERDUE.value)
+
+        required_statuses = [
+            rented_detail_status,
+            overdue_detail_status,
+            returned_detail_status,
+            lost_detail_status,
+            rented_copy_status,
+            final_copy_status,
+            closed_rental_status,
+            partially_returned_status,
+            partially_overdue_status,
+        ]
+        if any(status is None for status in required_statuses):
+            raise HTTPException(status_code=500, detail="Faltan estados base para devolver la copia")
+
+        detail = detail_repo.get_by_id(rental_detail_id)
+        if detail is None:
+            raise HTTPException(status_code=404, detail="El detalle de renta no existe")
+        if detail.status_id not in {rented_detail_status.id, overdue_detail_status.id}:
+            raise HTTPException(status_code=400, detail="El detalle de renta ya fue resuelto")
+
+        rental = rental_repo.get_by_id(detail.rental_id)
+        if rental is None:
+            raise HTTPException(status_code=404, detail="La renta asociada no existe")
+        if return_date < rental.rental_date:
+            raise HTTPException(status_code=400, detail="La fecha de devolucion no puede ser anterior a la renta")
+
+        copy = copy_repo.get_by_id(detail.rental_copy_id)
+        if copy is None:
+            raise HTTPException(status_code=404, detail="La copia asociada no existe")
+        if copy.status_id != rented_copy_status.id:
+            raise HTTPException(status_code=400, detail="La copia no esta alquilada")
+
+        late_days = max((return_date - rental.expected_return_date).days, 0)
+        late_fee_amount = Decimal(detail.late_fee_per_day) * late_days
+        replacement_fee_amount = Decimal("0")
+        final_detail_status_id = returned_detail_status.id
+
+        if request.copy_status_code == RentalCopyStatusCode.LOST.value:
+            replacement_fee_amount = Decimal(detail.replacement_cost)
+            final_detail_status_id = lost_detail_status.id
+
+        detail.status_id = final_detail_status_id
+        detail.late_days = late_days
+        detail.late_fee_amount = late_fee_amount
+        detail.replacement_fee_amount = replacement_fee_amount
+        detail.final_amount = Decimal(detail.subtotal) + late_fee_amount + replacement_fee_amount
+        detail.resolved_at = datetime.now()
+        detail.notes = request.notes
+
+        copy.status_id = final_copy_status.id
+
+        rental_details = detail_repo.list_by_rental_id(rental.id)
+        has_pending_details = any(
+            item.status_id in {rented_detail_status.id, overdue_detail_status.id}
+            for item in rental_details
+        )
+        has_overdue_pending_details = any(
+            item.status_id == overdue_detail_status.id
+            for item in rental_details
+        )
+
+        if has_pending_details:
+            if has_overdue_pending_details:
+                rental.status_id = partially_overdue_status.id
+            else:
+                rental.status_id = partially_returned_status.id
+        else:
+            rental.status_id = closed_rental_status.id
+            rental.actual_return_date = return_date
+
+        rental.late_fee_amount = sum(Decimal(item.late_fee_amount) for item in rental_details)
+        rental.final_amount = sum(Decimal(item.final_amount) for item in rental_details)
+
+        try:
+            self.db.commit()
+            self.db.refresh(detail)
+        except Exception:
+            self.db.rollback()
+            raise
+
+        status = detail_status_repo.get_by_id(detail.status_id)
+        if status is None:
+            raise HTTPException(status_code=500, detail="El estado del detalle no existe")
+
+        return RentalDetailResponse(
+            id=detail.id,
+            rental_id=detail.rental_id,
+            rental_copy_id=detail.rental_copy_id,
+            status_id=detail.status_id,
+            status_code=status.code,
+            price_per_day=detail.price_per_day,
+            late_fee_per_day=detail.late_fee_per_day,
+            replacement_cost=detail.replacement_cost,
+            rental_days=detail.rental_days,
+            late_days=detail.late_days,
+            subtotal=detail.subtotal,
+            late_fee_amount=detail.late_fee_amount,
+            replacement_fee_amount=detail.replacement_fee_amount,
+            final_amount=detail.final_amount,
+            resolved_at=detail.resolved_at,
+            notes=detail.notes,
         )

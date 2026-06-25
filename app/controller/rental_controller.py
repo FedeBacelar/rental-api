@@ -2,7 +2,9 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
+from app.dto.rental.rental_detail_dto import RentalDetailResponse
 from app.dto.rental.rental_dto import RentalCreateRequest, RentalResponse
+from app.dto.rental.rental_return_dto import ReturnRentalItemRequest
 from app.services.rental_service import RentalService
 
 router = APIRouter(prefix="/rentals", tags=["rentals"])
@@ -24,3 +26,16 @@ def get_rental(
 ) -> RentalResponse:
     service = RentalService(db)
     return service.get_rental(rental_id)
+
+
+@router.post(
+    "/details/{rental_detail_id}/return",
+    response_model=RentalDetailResponse,
+)
+def return_rental_item(
+    rental_detail_id: int,
+    request: ReturnRentalItemRequest,
+    db: Session = Depends(get_db),
+) -> RentalDetailResponse:
+    service = RentalService(db)
+    return service.return_rental_item(rental_detail_id, request)
