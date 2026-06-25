@@ -1,4 +1,4 @@
-﻿# 3.6 Listar copias por item
+﻿# 3.6 Listar copias por item 
 
 Trata de listar las copias fisicas asociadas a un item alquilable.
 

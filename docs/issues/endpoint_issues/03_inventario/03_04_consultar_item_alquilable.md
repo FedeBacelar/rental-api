@@ -1,4 +1,4 @@
-﻿# 3.4 Consultar item alquilable
+# 3.4 Consultar item alquilable
 
 Trata de consultar el detalle de un item alquilable existente.
 

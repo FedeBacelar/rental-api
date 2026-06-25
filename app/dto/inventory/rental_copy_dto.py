@@ -1,9 +1,16 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class RentalCopyCreateRequest(BaseModel):
-    pass
+    rental_item_id: int = Field(gt=0)
+    copy_number: int = Field(gt=0)
+    internal_code: str = Field(min_length=1, max_length=80)
 
 
 class RentalCopyResponse(BaseModel):
-    pass
+    id: int
+    rental_item_id: int
+    status_id: int
+    copy_number: int
+    internal_code: str
+    is_active: bool
