@@ -6,8 +6,10 @@ import webbrowser
 from alembic import command
 from alembic.config import Config
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import OperationalError
 
+from app.core.config import settings
 from app.controller.catalog.catalog_controller import router as catalog_router
 from app.controller.customer.customer_controller import router as customer_router
 from app.controller.health_controller import router as health_router
@@ -38,6 +40,14 @@ def run_migrations() -> None:
 
 
 app = FastAPI(title="RentalApi", version="0.1.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.on_event("startup")

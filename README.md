@@ -170,6 +170,16 @@ OVERDUE_WORKER_DAILY_TIME=00:00
 
 El worker cambia rentas `OPEN` vencidas a `OVERDUE` y sus detalles `RENTED` a `OVERDUE`. Las copias siguen `RENTED` hasta que se devuelvan.
 
+### CORS para frontend
+
+Para consumir la API desde Rental Manager Web, configurar los origins permitidos:
+
+```env
+CORS_ALLOWED_ORIGINS=http://localhost:4200,http://127.0.0.1:4200
+```
+
+La API habilita credenciales para que funcionen las cookies `HttpOnly` de login, refresh y logout.
+
 ## Problemas comunes
 
 Si Alembic informa que no encuentra una revision vieja, normalmente significa que el volumen local de MySQL quedo con migraciones de una version anterior del proyecto.

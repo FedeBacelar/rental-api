@@ -10,6 +10,7 @@ load_dotenv()
 @dataclass(frozen=True)
 class Settings:
     database_url: str
+    cors_allowed_origins: list[str]
     jwt_secret_key: str
     jwt_algorithm: str
     access_token_expire_minutes: int
@@ -27,6 +28,13 @@ def parse_bool(value: str | None, default: bool = False) -> bool:
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
+def parse_csv(value: str | None, default: list[str] | None = None) -> list[str]:
+    if value is None:
+        return default or []
+
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
 def get_settings() -> Settings:
     database_url = os.getenv("DATABASE_URL")
     if not database_url:
@@ -34,6 +42,10 @@ def get_settings() -> Settings:
 
     return Settings(
         database_url=database_url,
+        cors_allowed_origins=parse_csv(
+            os.getenv("CORS_ALLOWED_ORIGINS"),
+            default=["http://localhost:4200", "http://127.0.0.1:4200"],
+        ),
         jwt_secret_key=os.getenv("JWT_SECRET_KEY", "dev-secret-change-me-at-least-32-bytes"),
         jwt_algorithm=os.getenv("JWT_ALGORITHM", "HS256"),
         access_token_expire_minutes=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "15")),
