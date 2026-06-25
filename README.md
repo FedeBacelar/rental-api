@@ -110,6 +110,26 @@ Si se usa Docker Compose, los valores de `.env.example` ya vienen preparados par
 
 Si se usa una base MySQL instalada localmente, se deben modificar los datos de conexion en `.env`.
 
+### Worker de vencimientos
+
+La API incluye un worker simple que marca rentas vencidas.
+
+Comportamiento:
+
+- Al iniciar la API, ejecuta una pasada si `OVERDUE_WORKER_RUN_ON_STARTUP=1`.
+- Luego corre una vez por dia en el horario definido por `OVERDUE_WORKER_DAILY_TIME`.
+- Por defecto corre a las `00:00`.
+
+Variables disponibles:
+
+```text
+OVERDUE_WORKER_ENABLED=1
+OVERDUE_WORKER_RUN_ON_STARTUP=1
+OVERDUE_WORKER_DAILY_TIME=00:00
+```
+
+El worker cambia rentas `OPEN` vencidas a `OVERDUE` y sus detalles `RENTED` a `OVERDUE`. Las copias siguen `RENTED` hasta que se devuelvan.
+
 ## Problemas comunes
 
 Si Alembic informa que no encuentra una revision vieja, normalmente significa que el volumen local de MySQL quedo con migraciones de una version anterior del proyecto.

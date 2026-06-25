@@ -18,12 +18,60 @@ from app.repositories.catalog.rental_status_type_repository import RentalStatusT
 from app.repositories.inventory.rental_copy_repository import RentalCopyRepository
 from app.repositories.inventory.rental_item_repository import RentalItemRepository
 from app.repositories.rental.customer_repository import CustomerRepository
+from app.repositories.rental.rental_detail_repository import RentalDetailRepository
 from app.repositories.rental.rental_repository import RentalRepository
 
 
 class RentalService:
     def __init__(self, db: Session):
         self.db = db
+
+    def mark_overdue_rentals(self, today: date | None = None) -> dict[str, int]:
+        today = today or date.today()
+
+        rental_status_repo = RentalStatusTypeRepository(self.db)
+        detail_status_repo = RentalDetailStatusTypeRepository(self.db)
+        rental_repo = RentalRepository(self.db)
+        detail_repo = RentalDetailRepository(self.db)
+
+        open_rental_status = rental_status_repo.get_by_code(RentalStatusCode.OPEN.value)
+        overdue_rental_status = rental_status_repo.get_by_code(RentalStatusCode.OVERDUE.value)
+        rented_detail_status = detail_status_repo.get_by_code(RentalDetailStatusCode.RENTED.value)
+        overdue_detail_status = detail_status_repo.get_by_code(RentalDetailStatusCode.OVERDUE.value)
+
+        required_statuses = [
+            open_rental_status,
+            overdue_rental_status,
+            rented_detail_status,
+            overdue_detail_status,
+        ]
+        if any(status is None for status in required_statuses):
+            raise RuntimeError("Faltan estados base para marcar rentas vencidas")
+
+        overdue_rentals = rental_repo.list_open_overdue(
+            open_status_id=open_rental_status.id,
+            today=today,
+        )
+
+        updated_details_count = 0
+        for rental in overdue_rentals:
+            rental.status_id = overdue_rental_status.id
+
+            details = detail_repo.list_by_rental_id_and_status_id(
+                rental_id=rental.id,
+                status_id=rented_detail_status.id,
+            )
+
+            for detail in details:
+                detail.status_id = overdue_detail_status.id
+                updated_details_count += 1
+
+        self.db.commit()
+
+        return {
+            "updated_rentals": len(overdue_rentals),
+            "updated_details": updated_details_count,
+        }
 
     def create_rental(self, request: RentalCreateRequest) -> RentalResponse:
         # --- Repositorios que vamos a usar ---

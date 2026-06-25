@@ -7,6 +7,7 @@ Los documentos principales siguen un orden simple:
 1. `01_objetivo.md`
 2. `02_arquitectura.md`
 3. `03_entidades_del_sistema.md`
+4. `04_reglas_estados_y_worker.md`
 
 Documento complementario:
 

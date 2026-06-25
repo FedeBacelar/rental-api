@@ -1,4 +1,5 @@
-﻿from typing import Any, Optional
+from datetime import date
+from typing import Any, Optional
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -21,10 +22,36 @@ class RentalRepository:
         return self.db.scalar(select(Rental).where(Rental.id == rental_id))
 
     def list_by_customer_id(self, customer_id: int) -> list[Rental]:
-        return list(self.db.scalars(select(Rental).where(Rental.customer_id == customer_id).order_by(Rental.rental_date.desc())).all())
+        return list(
+            self.db.scalars(
+                select(Rental)
+                .where(Rental.customer_id == customer_id)
+                .order_by(Rental.rental_date.desc())
+            ).all()
+        )
 
     def list_by_status_id(self, status_id: int) -> list[Rental]:
-        return list(self.db.scalars(select(Rental).where(Rental.status_id == status_id).order_by(Rental.rental_date.desc())).all())
+        return list(
+            self.db.scalars(
+                select(Rental)
+                .where(Rental.status_id == status_id)
+                .order_by(Rental.rental_date.desc())
+            ).all()
+        )
+
+    def list_open_overdue(
+        self,
+        open_status_id: int,
+        today: date,
+    ) -> list[Rental]:
+        return list(
+            self.db.scalars(
+                select(Rental).where(
+                    Rental.status_id == open_status_id,
+                    Rental.expected_return_date < today,
+                )
+            ).all()
+        )
 
     def update(self, rental: Rental, data: dict[str, Any]) -> Rental:
         for field, value in data.items():
@@ -38,6 +65,3 @@ class RentalRepository:
         self.db.commit()
         self.db.refresh(rental)
         return rental
-
-
-
