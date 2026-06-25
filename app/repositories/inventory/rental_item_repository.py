@@ -1,4 +1,4 @@
-﻿from typing import Any, Optional
+from typing import Any, Optional
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -30,5 +30,9 @@ class RentalItemRepository:
         self.db.refresh(item)
         return item
 
-
+    def create_pending(self, data: dict[str, Any]) -> RentalItem:
+        item = RentalItem(**data)
+        self.db.add(item)
+        self.db.flush()
+        return item
 

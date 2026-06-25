@@ -62,3 +62,5 @@ class CustomerService:
         customers = customer_repository.list_active()
 
         return customers_to_customer_response(customers)
+    
+    

@@ -11,7 +11,6 @@ def genre_to_genre_response(genre: Genre) -> GenreResponse:
         is_active=genre.is_active,
     )
 
-
 def genres_to_genre_response(genres: list[Genre]) -> list[GenreResponse]:
     # Reutiliza el mapeo individual para mantener respuestas consistentes.
     return [genre_to_genre_response(genre) for genre in genres]

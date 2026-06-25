@@ -15,13 +15,16 @@ class Settings:
     access_token_expire_minutes: int
     refresh_token_expire_days: int
     auth_cookie_secure: bool
+    overdue_worker_enabled: bool
+    overdue_worker_run_on_startup: bool
+    overdue_worker_daily_time: str
 
 
 def parse_bool(value: str | None, default: bool = False) -> bool:
     if value is None:
         return default
 
-    return value.lower() in {"1", "true", "yes", "on"}
+    return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
 def get_settings() -> Settings:
@@ -36,6 +39,9 @@ def get_settings() -> Settings:
         access_token_expire_minutes=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "15")),
         refresh_token_expire_days=int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "7")),
         auth_cookie_secure=parse_bool(os.getenv("AUTH_COOKIE_SECURE"), default=False),
+        overdue_worker_enabled=parse_bool(os.getenv("OVERDUE_WORKER_ENABLED"), default=True),
+        overdue_worker_run_on_startup=parse_bool(os.getenv("OVERDUE_WORKER_RUN_ON_STARTUP"), default=True),
+        overdue_worker_daily_time=os.getenv("OVERDUE_WORKER_DAILY_TIME", "00:00"),
     )
 
 

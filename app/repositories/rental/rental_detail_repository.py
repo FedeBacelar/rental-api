@@ -1,4 +1,4 @@
-﻿from typing import Any, Optional
+from typing import Any, Optional
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -29,10 +29,38 @@ class RentalDetailRepository:
         return self.db.scalar(select(RentalDetail).where(RentalDetail.id == detail_id))
 
     def list_by_rental_id(self, rental_id: int) -> list[RentalDetail]:
-        return list(self.db.scalars(select(RentalDetail).where(RentalDetail.rental_id == rental_id).order_by(RentalDetail.id.asc())).all())
+        return list(
+            self.db.scalars(
+                select(RentalDetail)
+                .where(RentalDetail.rental_id == rental_id)
+                .order_by(RentalDetail.id.asc())
+            ).all()
+        )
 
     def list_by_status_id(self, status_id: int) -> list[RentalDetail]:
-        return list(self.db.scalars(select(RentalDetail).where(RentalDetail.status_id == status_id).order_by(RentalDetail.id.asc())).all())
+        return list(
+            self.db.scalars(
+                select(RentalDetail)
+                .where(RentalDetail.status_id == status_id)
+                .order_by(RentalDetail.id.asc())
+            ).all()
+        )
+
+    def list_by_rental_id_and_status_id(
+        self,
+        rental_id: int,
+        status_id: int,
+    ) -> list[RentalDetail]:
+        return list(
+            self.db.scalars(
+                select(RentalDetail)
+                .where(
+                    RentalDetail.rental_id == rental_id,
+                    RentalDetail.status_id == status_id,
+                )
+                .order_by(RentalDetail.id.asc())
+            ).all()
+        )
 
     def update(self, detail: RentalDetail, data: dict[str, Any]) -> RentalDetail:
         for field, value in data.items():
@@ -46,6 +74,3 @@ class RentalDetailRepository:
         self.db.commit()
         self.db.refresh(detail)
         return detail
-
-
-
