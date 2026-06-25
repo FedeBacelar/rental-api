@@ -1,4 +1,5 @@
 from datetime import date
+from decimal import Decimal
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
@@ -41,6 +42,16 @@ class RentalService:
         open_rental_status = rental_status_repo.get_by_code(RentalStatusCode.OPEN.value)
         rented_detail_status = detail_status_repo.get_by_code(RentalDetailStatusCode.RENTED.value)
 
+        required_statuses = [
+            active_customer_status,
+            available_status,
+            rented_copy_status,
+            open_rental_status,
+            rented_detail_status,
+        ]
+        if any(status is None for status in required_statuses):
+            raise HTTPException(status_code=500, detail="Faltan estados base para crear la renta")
+
         # --- Paso 2: validar el cliente ---
         customer = customer_repo.get_by_id(request.customer_id)
         if customer is None:
@@ -51,6 +62,8 @@ class RentalService:
         # --- Paso 3: validar que pidio al menos una copia ---
         if not request.rental_copy_ids:
             raise HTTPException(status_code=400, detail="Debe incluir al menos una copia")
+        if len(request.rental_copy_ids) != len(set(request.rental_copy_ids)):
+            raise HTTPException(status_code=400, detail="No se puede incluir la misma copia mas de una vez")
 
         # --- Paso 4: calcular los dias de alquiler ---
         rental_date = date.today()
@@ -61,16 +74,24 @@ class RentalService:
         # --- Paso 5: validar cada copia y preparar los detalles (con snapshot de precios) ---
         copies_to_rent = []
         details_data = []
+        total_amount = Decimal("0")
         for copy_id in request.rental_copy_ids:
             copy = copy_repo.get_by_id(copy_id)
             if copy is None:
                 raise HTTPException(status_code=404, detail=f"La copia {copy_id} no existe")
+            if not copy.is_active:
+                raise HTTPException(status_code=400, detail=f"La copia {copy_id} no esta activa")
             if copy.status_id != available_status.id:
                 raise HTTPException(status_code=400, detail=f"La copia {copy_id} no esta disponible")
 
             item = item_repo.get_by_id(copy.rental_item_id)
             if item is None:
                 raise HTTPException(status_code=404, detail=f"No se encontro el item de la copia {copy_id}")
+            if not item.is_active:
+                raise HTTPException(status_code=400, detail=f"El item de la copia {copy_id} no esta activo")
+
+            subtotal = Decimal(item.base_daily_price) * rental_days
+            total_amount += subtotal
 
             copies_to_rent.append(copy)
             details_data.append({
@@ -80,6 +101,8 @@ class RentalService:
                 "late_fee_per_day": item.late_fee_per_day,
                 "replacement_cost": item.replacement_cost,
                 "rental_days": rental_days,
+                "subtotal": subtotal,
+                "final_amount": subtotal,
             })
 
         # --- Paso 6 al 8: crear todo en una sola transaccion (todo o nada) ---
@@ -90,6 +113,8 @@ class RentalService:
                 status_id=open_rental_status.id,
                 rental_date=rental_date,
                 expected_return_date=request.expected_return_date,
+                total_amount=total_amount,
+                final_amount=total_amount,
             )
             self.db.add(rental)
             self.db.flush()  # asigna el id de la renta sin confirmar aun
@@ -132,6 +157,8 @@ class RentalService:
 
         # Traducir el status_id (numero) a su status_code (texto)
         status = rental_status_repo.get_by_id(rental.status_id)
+        if status is None:
+            raise HTTPException(status_code=500, detail="El estado de la renta no existe")
 
         return RentalResponse(
             id=rental.id,
