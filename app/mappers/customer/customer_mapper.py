@@ -7,6 +7,7 @@ def customer_to_customer_response(customer: Customer) -> CustomerResponse:
     return CustomerResponse(
         id=customer.id,
         status_id=customer.status_id,
+        full_name=f"{customer.first_name} {customer.last_name}",
         first_name=customer.first_name,
         last_name=customer.last_name,
         document_number=customer.document_number,

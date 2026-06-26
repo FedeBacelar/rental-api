@@ -2,10 +2,6 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.dto.customer import CustomerCreateRequest, CustomerResponse
-from app.mappers.customer import (
-    customer_to_customer_response,
-    customers_to_customer_response,
-)
 from app.repositories.customer.customer_repository import CustomerRepository
 from app.repositories.customer.customer_status_type_repository import CustomerStatusTypeRepository
 
@@ -49,18 +45,33 @@ class CustomerService:
 
         customer = customer_repository.create(customer_data)
 
-        return customer_to_customer_response(customer)
+        return self._build_customer_response(customer)
 
     def search_customers(self, query: str) -> list[CustomerResponse]:
         customer_repository = CustomerRepository(self.db)
         customers = customer_repository.search_customers(query)
 
-        return customers_to_customer_response(customers)
+        return [self._build_customer_response(customer) for customer in customers]
 
     def list_active_customers(self) -> list[CustomerResponse]:
         customer_repository = CustomerRepository(self.db)
         customers = customer_repository.list_active()
 
-        return customers_to_customer_response(customers)
-    
-    
+        return [self._build_customer_response(customer) for customer in customers]
+
+    def _build_customer_response(self, customer) -> CustomerResponse:
+        status = CustomerStatusTypeRepository(self.db).get_by_id(customer.status_id)
+        return CustomerResponse(
+            id=customer.id,
+            status_id=customer.status_id,
+            status_code=status.code if status else None,
+            status_name=status.name if status else None,
+            first_name=customer.first_name,
+            last_name=customer.last_name,
+            full_name=f"{customer.first_name} {customer.last_name}",
+            document_number=customer.document_number,
+            email=customer.email,
+            phone=customer.phone,
+            address=customer.address,
+            is_active=customer.is_active,
+        )

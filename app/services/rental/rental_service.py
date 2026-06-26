@@ -4,8 +4,18 @@ from decimal import Decimal
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from app.dto.rental.rental_detail_dto import RentalDetailResponse
-from app.dto.rental.rental_dto import RentalCreateRequest, RentalResponse
+from app.dto.rental.rental_detail_dto import (
+    RentalDetailCopySummary,
+    RentalDetailItemSummary,
+    RentalDetailResponse,
+    RentalDetailStatusSummary,
+)
+from app.dto.rental.rental_dto import (
+    RentalCreateRequest,
+    RentalCustomerSummary,
+    RentalResponse,
+    RentalStatusSummary,
+)
 from app.dto.rental.rental_return_dto import ReturnRentalItemRequest
 from app.enums.customer import CustomerStatusCode
 from app.enums.inventory import RentalCopyStatusCode
@@ -17,6 +27,7 @@ from app.repositories.customer.customer_status_type_repository import CustomerSt
 from app.repositories.inventory.rental_copy_repository import RentalCopyRepository
 from app.repositories.inventory.rental_copy_status_type_repository import RentalCopyStatusTypeRepository
 from app.repositories.inventory.rental_item_repository import RentalItemRepository
+from app.repositories.inventory.rental_item_type_repository import RentalItemTypeRepository
 from app.repositories.rental.rental_detail_repository import RentalDetailRepository
 from app.repositories.rental.rental_detail_status_type_repository import RentalDetailStatusTypeRepository
 from app.repositories.rental.rental_repository import RentalRepository
@@ -192,39 +203,85 @@ class RentalService:
             raise
 
         # --- Paso 9: devolver la renta creada ---
-        return RentalResponse(
-            id=rental.id,
-            customer_id=rental.customer_id,
-            status_id=rental.status_id,
-            status_code=open_rental_status.code,
-            rental_date=rental.rental_date,
-            expected_return_date=rental.expected_return_date,
-            total_amount=rental.total_amount,
-        )
+        return self._build_rental_response(rental)
 
     def get_rental(self, rental_id: int) -> RentalResponse:
         rental_repo = RentalRepository(self.db)
-        rental_status_repo = RentalStatusTypeRepository(self.db)
 
         # Buscar la renta por id
         rental = rental_repo.get_by_id(rental_id)
         if rental is None:
             raise HTTPException(status_code=404, detail="La renta no existe")
 
-        # Traducir el status_id (numero) a su status_code (texto)
-        status = rental_status_repo.get_by_id(rental.status_id)
-        if status is None:
-            raise HTTPException(status_code=500, detail="El estado de la renta no existe")
+        return self._build_rental_response(rental)
 
-        return RentalResponse(
-            id=rental.id,
-            customer_id=rental.customer_id,
-            status_id=rental.status_id,
-            status_code=status.code,
-            rental_date=rental.rental_date,
-            expected_return_date=rental.expected_return_date,
-            total_amount=rental.total_amount,
+    def list_rentals(
+        self,
+        customer_id: int | None = None,
+        status_code: str | None = None,
+        overdue: bool = False,
+    ) -> list[RentalResponse]:
+        customer_repo = CustomerRepository(self.db)
+        rental_repo = RentalRepository(self.db)
+        rental_status_repo = RentalStatusTypeRepository(self.db)
+
+        if customer_id is not None and customer_repo.get_by_id(customer_id) is None:
+            raise HTTPException(status_code=404, detail="El cliente no existe")
+
+        status_id = None
+        if status_code is not None:
+            status = rental_status_repo.get_by_code(status_code)
+            if status is None:
+                raise HTTPException(status_code=400, detail="El estado de renta no existe")
+            status_id = status.id
+
+        overdue_status_ids = None
+        if overdue:
+            overdue_codes = [
+                RentalStatusCode.OPEN.value,
+                RentalStatusCode.OVERDUE.value,
+                RentalStatusCode.PARTIALLY_RETURNED.value,
+                RentalStatusCode.PARTIALLY_OVERDUE.value,
+            ]
+            statuses = [
+                rental_status_repo.get_by_code(code)
+                for code in overdue_codes
+            ]
+            overdue_status_ids = [
+                status.id
+                for status in statuses
+                if status is not None
+            ]
+
+        rentals = rental_repo.list_filtered(
+            customer_id=customer_id,
+            status_id=status_id,
+            overdue_status_ids=overdue_status_ids,
+            today=date.today() if overdue else None,
         )
+        return [self._build_rental_response(rental) for rental in rentals]
+
+    def list_rentals_by_customer(self, customer_id: int) -> list[RentalResponse]:
+        customer_repo = CustomerRepository(self.db)
+        rental_repo = RentalRepository(self.db)
+
+        customer = customer_repo.get_by_id(customer_id)
+        if customer is None:
+            raise HTTPException(status_code=404, detail="El cliente no existe")
+
+        rentals = rental_repo.list_by_customer_id(customer_id)
+        return [self._build_rental_response(rental) for rental in rentals]
+
+    def list_rental_details(self, rental_id: int) -> list[RentalDetailResponse]:
+        rental_repo = RentalRepository(self.db)
+        detail_repo = RentalDetailRepository(self.db)
+
+        rental = rental_repo.get_by_id(rental_id)
+        if rental is None:
+            raise HTTPException(status_code=404, detail="La renta no existe")
+
+        details = detail_repo.list_by_rental_id(rental_id)
+        return [self._build_rental_detail_response(detail) for detail in details]
 
     def return_rental_item(
         self,
@@ -332,16 +389,98 @@ class RentalService:
             self.db.rollback()
             raise
 
-        status = detail_status_repo.get_by_id(detail.status_id)
+        return self._build_rental_detail_response(detail)
+
+    def _build_rental_response(self, rental: Rental) -> RentalResponse:
+        customer = CustomerRepository(self.db).get_by_id(rental.customer_id)
+        status = RentalStatusTypeRepository(self.db).get_by_id(rental.status_id)
         if status is None:
+            raise HTTPException(status_code=500, detail="El estado de la renta no existe")
+
+        details = RentalDetailRepository(self.db).list_by_rental_id(rental.id)
+        detail_status_repo = RentalDetailStatusTypeRepository(self.db)
+        rented_status = detail_status_repo.get_by_code(RentalDetailStatusCode.RENTED.value)
+        overdue_status = detail_status_repo.get_by_code(RentalDetailStatusCode.OVERDUE.value)
+        pending_status_ids = {
+            item.id
+            for item in [rented_status, overdue_status]
+            if item is not None
+        }
+
+        customer_summary = None
+        if customer is not None:
+            customer_summary = RentalCustomerSummary(
+                id=customer.id,
+                full_name=f"{customer.first_name} {customer.last_name}",
+                document_number=customer.document_number,
+            )
+
+        status_summary = RentalStatusSummary(
+            code=status.code,
+            name=status.name,
+        )
+
+        return RentalResponse(
+            id=rental.id,
+            customer_id=rental.customer_id,
+            customer=customer_summary,
+            status_id=rental.status_id,
+            status_code=status.code,
+            status_name=status.name,
+            status=status_summary,
+            rental_date=rental.rental_date,
+            expected_return_date=rental.expected_return_date,
+            actual_return_date=rental.actual_return_date,
+            total_amount=rental.total_amount,
+            late_fee_amount=rental.late_fee_amount,
+            final_amount=rental.final_amount,
+            items_count=len(details),
+            pending_items_count=sum(
+                1 for detail in details if detail.status_id in pending_status_ids
+            ),
+        )
+
+    def _build_rental_detail_response(self, detail: RentalDetail) -> RentalDetailResponse:
+        copy = RentalCopyRepository(self.db).get_by_id(detail.rental_copy_id)
+        item = RentalItemRepository(self.db).get_by_id(copy.rental_item_id) if copy else None
+        item_type = RentalItemTypeRepository(self.db).get_by_id(item.item_type_id) if item else None
+        copy_status = RentalCopyStatusTypeRepository(self.db).get_by_id(copy.status_id) if copy else None
+        detail_status = RentalDetailStatusTypeRepository(self.db).get_by_id(detail.status_id)
+        if detail_status is None:
             raise HTTPException(status_code=500, detail="El estado del detalle no existe")
+
+        copy_summary = None
+        if copy is not None:
+            copy_summary = RentalDetailCopySummary(
+                id=copy.id,
+                copy_number=copy.copy_number,
+                inventory_code=copy.internal_code,
+                status_code=copy_status.code if copy_status else None,
+            )
+
+        item_summary = None
+        if item is not None and item_type is not None:
+            item_summary = RentalDetailItemSummary(
+                id=item.id,
+                type_code=item_type.code,
+                title=item.title,
+            )
+
+        status_summary = RentalDetailStatusSummary(
+            code=detail_status.code,
+            name=detail_status.name,
+        )
 
         return RentalDetailResponse(
             id=detail.id,
             rental_id=detail.rental_id,
             rental_copy_id=detail.rental_copy_id,
+            rental_copy=copy_summary,
+            item=item_summary,
             status_id=detail.status_id,
-            status_code=status.code,
+            status_code=detail_status.code,
+            status_name=detail_status.name,
+            status=status_summary,
             price_per_day=detail.price_per_day,
             late_fee_per_day=detail.late_fee_per_day,
             replacement_cost=detail.replacement_cost,

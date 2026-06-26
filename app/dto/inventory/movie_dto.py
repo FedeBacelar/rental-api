@@ -18,6 +18,8 @@ class MovieCreateRequest(BaseModel):
 class MovieResponse(BaseModel):
     id: int 
     genre_id: int
+    genre_code: str | None = None
+    genre_name: str | None = None
     title: str
     description: str | None = None
     age_rating: str | None = None

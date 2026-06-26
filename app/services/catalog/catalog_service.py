@@ -4,7 +4,9 @@ from app.dto.catalog import (
     CustomerStatusResponse,
     GenreResponse,
     PlatformResponse,
+    RentalDetailStatusResponse,
     RentalCopyStatusResponse,
+    RentalStatusResponse,
 )
 from app.mappers.catalog import (
     genres_to_genre_response, 
@@ -12,7 +14,10 @@ from app.mappers.catalog import (
 )
 from app.repositories.catalog.genre_repository import GenreRepository
 from app.repositories.catalog.platform_repository import PlatformRepository
+from app.repositories.customer.customer_status_type_repository import CustomerStatusTypeRepository
 from app.repositories.inventory.rental_copy_status_type_repository import RentalCopyStatusTypeRepository
+from app.repositories.rental.rental_detail_status_type_repository import RentalDetailStatusTypeRepository
+from app.repositories.rental.rental_status_type_repository import RentalStatusTypeRepository
 
 
 class CatalogService:
@@ -52,8 +57,43 @@ class CatalogService:
         ]
 
     def list_customer_statuses(self) -> list[CustomerStatusResponse]:
-        # Issue 1.4: implementar este metodo.
-        # Usar CustomerStatusTypeRepository para obtener los estados de cliente activos.
-        # Convertir el resultado al DTO CustomerStatusResponse con la estrategia que prefieras.
-        # Devolver una lista de estados para que el controller responda al endpoint.
-        pass
+        repository = CustomerStatusTypeRepository(self.db)
+        statuses = repository.list_active()
+
+        return [
+            CustomerStatusResponse(
+                id=status.id,
+                code=status.code,
+                name=status.name,
+                is_active=status.is_active,
+            )
+            for status in statuses
+        ]
+
+    def list_rental_statuses(self) -> list[RentalStatusResponse]:
+        repository = RentalStatusTypeRepository(self.db)
+        statuses = repository.list_active()
+
+        return [
+            RentalStatusResponse(
+                id=status.id,
+                code=status.code,
+                name=status.name,
+                is_active=status.is_active,
+            )
+            for status in statuses
+        ]
+
+    def list_rental_detail_statuses(self) -> list[RentalDetailStatusResponse]:
+        repository = RentalDetailStatusTypeRepository(self.db)
+        statuses = repository.list_active()
+
+        return [
+            RentalDetailStatusResponse(
+                id=status.id,
+                code=status.code,
+                name=status.name,
+                is_active=status.is_active,
+            )
+            for status in statuses
+        ]

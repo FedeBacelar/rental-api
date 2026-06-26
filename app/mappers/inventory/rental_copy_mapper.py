@@ -10,7 +10,7 @@ def rental_copy_to_rental_copy_response(
         rental_item_id=rental_copy.rental_item_id,
         status_id=rental_copy.status_id,
         copy_number=rental_copy.copy_number,
-        internal_code=rental_copy.internal_code,
+        inventory_code=rental_copy.internal_code,
         is_active=rental_copy.is_active,
     )
 

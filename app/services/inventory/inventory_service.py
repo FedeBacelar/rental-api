@@ -15,9 +15,6 @@ from app.enums.inventory import RentalCopyStatusCode, RentalItemTypeCode
 from app.mappers.inventory import (
     movie_to_movie_response,
     videogame_to_videogame_response,
-    rental_items_to_rental_item_response,
-    rental_copy_to_rental_copy_response,
-    rental_copies_to_rental_copy_responses,
 )
 from app.repositories.catalog import (
     GenreRepository,
@@ -92,7 +89,12 @@ class InventoryService:
             self.db.rollback()
             raise
 
-        return movie_to_movie_response(rental_item, movie_detail)
+        return movie_to_movie_response(
+            rental_item,
+            movie_detail,
+            genre_code=genre.code,
+            genre_name=genre.name,
+        )
 
 
     def create_videogame(self, request: VideogameCreateRequest) -> VideogameResponse:
@@ -158,13 +160,20 @@ class InventoryService:
             self.db.rollback()
             raise
         
-        return videogame_to_videogame_response(rental_item, videogame_detail)
+        return videogame_to_videogame_response(
+            rental_item,
+            videogame_detail,
+            genre_code=genre.code,
+            genre_name=genre.name,
+            platform_code=platform.code,
+            platform_name=platform.name,
+        )
     
     def list_rental_items(self) -> list[RentalItemResponse]:
         item_repository = RentalItemRepository(self.db)
         items = item_repository.list_active()
 
-        return rental_items_to_rental_item_response(items)
+        return [self._build_rental_item_response(item) for item in items]
 
     def get_rental_item(self, item_id: int) -> MovieResponse | VideogameResponse:
         item_repository = RentalItemRepository(self.db)
@@ -197,7 +206,14 @@ class InventoryService:
                     detail="Movie details were not found",
                 )
 
-            return movie_to_movie_response(item, movie_detail)
+            genre = GenreRepository(self.db).get_by_id(item.genre_id)
+
+            return movie_to_movie_response(
+                item,
+                movie_detail,
+                genre_code=genre.code if genre else None,
+                genre_name=genre.name if genre else None,
+            )
 
         if item_type.code == RentalItemTypeCode.VIDEOGAME.value:
             videogame_detail = videogame_repository.get_by_rental_item_id(item.id)
@@ -207,7 +223,17 @@ class InventoryService:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Videogame details were not found",
                 )
-            return videogame_to_videogame_response(item, videogame_detail)
+            genre = GenreRepository(self.db).get_by_id(item.genre_id)
+            platform = PlatformRepository(self.db).get_by_id(videogame_detail.platform_id)
+
+            return videogame_to_videogame_response(
+                item,
+                videogame_detail,
+                genre_code=genre.code if genre else None,
+                genre_name=genre.name if genre else None,
+                platform_code=platform.code if platform else None,
+                platform_name=platform.name if platform else None,
+            )
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -241,9 +267,7 @@ class InventoryService:
                 detail="Copy number already exists for this rental item",
             )
 
-        existing_internal_code = copy_repository.get_by_internal_code(
-            request.internal_code
-        )
+        existing_internal_code = copy_repository.get_by_internal_code(request.inventory_code)
 
         if existing_internal_code is not None:
             raise HTTPException(
@@ -267,7 +291,7 @@ class InventoryService:
                     "rental_item_id": request.rental_item_id,
                     "status_id": available_status.id,
                     "copy_number": request.copy_number,
-                    "internal_code": request.internal_code,
+                    "internal_code": request.inventory_code,
                     "is_active": True,
                 }
             )
@@ -280,7 +304,7 @@ class InventoryService:
                 detail="Rental copy already exists",
             ) from exc
 
-        return rental_copy_to_rental_copy_response(rental_copy)
+        return self._build_rental_copy_response(rental_copy)
 
     def get_rental_copy(self, copy_id: int) -> RentalCopyResponse:
         copy_repository = RentalCopyRepository(self.db)
@@ -293,7 +317,7 @@ class InventoryService:
                 detail="Rental copy was not found",
             )
 
-        return rental_copy_to_rental_copy_response(rental_copy)
+        return self._build_rental_copy_response(rental_copy)
 
     def list_rental_copies_by_item(self, item_id: int) -> list[RentalCopyResponse]:
         item_repository = RentalItemRepository(self.db)
@@ -309,7 +333,10 @@ class InventoryService:
 
         rental_copies = copy_repository.list_by_item_id(item_id)
 
-        return rental_copies_to_rental_copy_responses(rental_copies)
+        return [
+            self._build_rental_copy_response(rental_copy)
+            for rental_copy in rental_copies
+        ]
 
     def list_available_rental_copies(self) -> list[RentalCopyResponse]:
         copy_repository = RentalCopyRepository(self.db)
@@ -329,4 +356,50 @@ class InventoryService:
             available_status.id
         )
 
-        return rental_copies_to_rental_copy_responses(rental_copies)
+        return [
+            self._build_rental_copy_response(rental_copy)
+            for rental_copy in rental_copies
+        ]
+
+    def _build_rental_item_response(self, item) -> RentalItemResponse:
+        item_type = RentalItemTypeRepository(self.db).get_by_id(item.item_type_id)
+        genre = GenreRepository(self.db).get_by_id(item.genre_id)
+
+        return RentalItemResponse(
+            id=item.id,
+            item_type_id=item.item_type_id,
+            item_type_code=item_type.code if item_type else None,
+            item_type_name=item_type.name if item_type else None,
+            genre_id=item.genre_id,
+            genre_code=genre.code if genre else None,
+            genre_name=genre.name if genre else None,
+            title=item.title,
+            description=item.description,
+            age_rating=item.age_rating,
+            base_daily_price=item.base_daily_price,
+            late_fee_per_day=item.late_fee_per_day,
+            replacement_cost=item.replacement_cost,
+            is_active=item.is_active,
+        )
+
+    def _build_rental_copy_response(self, rental_copy) -> RentalCopyResponse:
+        item_repository = RentalItemRepository(self.db)
+        item_type_repository = RentalItemTypeRepository(self.db)
+        copy_status_repository = RentalCopyStatusTypeRepository(self.db)
+
+        item = item_repository.get_by_id(rental_copy.rental_item_id)
+        item_type = item_type_repository.get_by_id(item.item_type_id) if item else None
+        status = copy_status_repository.get_by_id(rental_copy.status_id)
+
+        return RentalCopyResponse(
+            id=rental_copy.id,
+            rental_item_id=rental_copy.rental_item_id,
+            item_title=item.title if item else None,
+            item_type_code=item_type.code if item_type else None,
+            status_id=rental_copy.status_id,
+            status_code=status.code if status else None,
+            status_name=status.name if status else None,
+            copy_number=rental_copy.copy_number,
+            inventory_code=rental_copy.internal_code,
+            is_active=rental_copy.is_active,
+        )

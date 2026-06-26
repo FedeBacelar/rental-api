@@ -30,6 +30,30 @@ class RentalRepository:
             ).all()
         )
 
+    def list_filtered(
+        self,
+        customer_id: int | None = None,
+        status_id: int | None = None,
+        overdue_status_ids: list[int] | None = None,
+        today: date | None = None,
+    ) -> list[Rental]:
+        query = select(Rental)
+
+        if customer_id is not None:
+            query = query.where(Rental.customer_id == customer_id)
+
+        if status_id is not None:
+            query = query.where(Rental.status_id == status_id)
+
+        if overdue_status_ids is not None and today is not None:
+            query = query.where(
+                Rental.status_id.in_(overdue_status_ids),
+                Rental.expected_return_date < today,
+            )
+
+        query = query.order_by(Rental.rental_date.desc(), Rental.id.desc())
+        return list(self.db.scalars(query).all())
+
     def list_by_status_id(self, status_id: int) -> list[Rental]:
         return list(
             self.db.scalars(

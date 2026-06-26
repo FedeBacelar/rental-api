@@ -13,8 +13,11 @@ class CustomerCreateRequest(BaseModel):
 class CustomerResponse(BaseModel):
     id: int
     status_id: int
+    status_code: str | None = None
+    status_name: str | None = None
     first_name: str
     last_name: str
+    full_name: str | None = None
     document_number: str
     email: str | None = None
     phone: str | None = None

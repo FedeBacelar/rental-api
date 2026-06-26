@@ -4,8 +4,10 @@ from sqlalchemy.orm import Session
 from app.core.auth import require_permission
 from app.db.session import get_db
 from app.dto.customer import CustomerCreateRequest, CustomerResponse
+from app.dto.rental import RentalResponse
 from app.enums.security import PermissionCode
 from app.services.customer.customer_service import CustomerService
+from app.services.rental.rental_service import RentalService
 
 
 router = APIRouter(prefix="/customers", tags=["customers"])
@@ -50,3 +52,17 @@ def list_active_customers(db: Session = Depends(get_db)) -> list[CustomerRespons
     service = CustomerService(db)
 
     return service.list_active_customers()
+
+
+@router.get(
+    "/{customer_id}/rentals",
+    response_model=list[RentalResponse],
+    dependencies=[Depends(require_permission(PermissionCode.RENTALS_READ))],
+)
+def list_customer_rentals(
+    customer_id: int,
+    db: Session = Depends(get_db),
+) -> list[RentalResponse]:
+    service = RentalService(db)
+
+    return service.list_rentals_by_customer(customer_id)

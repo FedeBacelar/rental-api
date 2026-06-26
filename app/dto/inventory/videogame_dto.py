@@ -18,6 +18,8 @@ class VideogameCreateRequest(BaseModel):
 class VideogameResponse(BaseModel):
     id: int
     genre_id: int
+    genre_code: str | None = None
+    genre_name: str | None = None
     title: str
     description: str | None = None
     age_rating: str | None = None
@@ -26,6 +28,8 @@ class VideogameResponse(BaseModel):
     replacement_cost: float
 
     platform_id: int
+    platform_code: str | None = None
+    platform_name: str | None = None
     publisher: str
     multiplayer: bool
 

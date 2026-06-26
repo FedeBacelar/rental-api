@@ -6,10 +6,14 @@ from app.models.inventory.rental_item import RentalItem
 def movie_to_movie_response(
     rental_item: RentalItem,
     movie_detail: MovieDetail,
+    genre_code: str | None = None,
+    genre_name: str | None = None,
 ) -> MovieResponse:
     return MovieResponse(
         id=rental_item.id,
         genre_id=rental_item.genre_id,
+        genre_code=genre_code,
+        genre_name=genre_name,
         title=rental_item.title,
         description=rental_item.description,
         age_rating=rental_item.age_rating,

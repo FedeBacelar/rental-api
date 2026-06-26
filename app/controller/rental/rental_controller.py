@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.auth import require_permission
@@ -24,6 +24,51 @@ def create_rental(
 ) -> RentalResponse:
     service = RentalService(db)
     return service.create_rental(request)
+
+
+@router.get(
+    "",
+    response_model=list[RentalResponse],
+    dependencies=[Depends(require_permission(PermissionCode.RENTALS_READ))],
+)
+def list_rentals(
+    customer_id: int | None = Query(default=None, gt=0),
+    status_code: str | None = None,
+    overdue: bool = False,
+    db: Session = Depends(get_db),
+) -> list[RentalResponse]:
+    service = RentalService(db)
+    return service.list_rentals(
+        customer_id=customer_id,
+        status_code=status_code,
+        overdue=overdue,
+    )
+
+
+@router.get(
+    "/customer/{customer_id}",
+    response_model=list[RentalResponse],
+    dependencies=[Depends(require_permission(PermissionCode.RENTALS_READ))],
+)
+def list_rentals_by_customer(
+    customer_id: int,
+    db: Session = Depends(get_db),
+) -> list[RentalResponse]:
+    service = RentalService(db)
+    return service.list_rentals_by_customer(customer_id)
+
+
+@router.get(
+    "/{rental_id}/details",
+    response_model=list[RentalDetailResponse],
+    dependencies=[Depends(require_permission(PermissionCode.RENTALS_READ))],
+)
+def list_rental_details(
+    rental_id: int,
+    db: Session = Depends(get_db),
+) -> list[RentalDetailResponse]:
+    service = RentalService(db)
+    return service.list_rental_details(rental_id)
 
 
 @router.get(

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.core.auth import require_permission
@@ -7,7 +7,9 @@ from app.dto.catalog import (
     CustomerStatusResponse,
     GenreResponse,
     PlatformResponse,
+    RentalDetailStatusResponse,
     RentalCopyStatusResponse,
+    RentalStatusResponse,
 )
 from app.enums.security import PermissionCode
 from app.services.catalog.catalog_service import CatalogService
@@ -43,15 +45,22 @@ def list_rental_copy_statuses(
 def list_customer_statuses(
     db: Session = Depends(get_db),
 ) -> list[CustomerStatusResponse]:
-    # Issue 1.4: este endpoint ya esta conectado.
-    # La logica pendiente vive en CatalogService.list_customer_statuses().
     service = CatalogService(db)
-    statuses = service.list_customer_statuses()
 
-    if statuses is None:
-        raise HTTPException(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED,
-            detail="Issue 1.4 pending implementation",
-        )
+    return service.list_customer_statuses()
 
-    return statuses
+
+@router.get("/rental-statuses", response_model=list[RentalStatusResponse])
+def list_rental_statuses(
+    db: Session = Depends(get_db),
+) -> list[RentalStatusResponse]:
+    service = CatalogService(db)
+    return service.list_rental_statuses()
+
+
+@router.get("/rental-detail-statuses", response_model=list[RentalDetailStatusResponse])
+def list_rental_detail_statuses(
+    db: Session = Depends(get_db),
+) -> list[RentalDetailStatusResponse]:
+    service = CatalogService(db)
+    return service.list_rental_detail_statuses()
